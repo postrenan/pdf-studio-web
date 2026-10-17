@@ -1,0 +1,26 @@
+{
+  "name": "pdf-studio-web",
+  "version": "1.1.0",
+  "description": "Aplicativo web completo e offline para mesclar, converter DOCX, imagens e manipular PDFs no navegador.",
+  "scripts": {
+    "start": "npx serve ."
+  },
+  "keywords": [
+    "pdf",
+    "merge-pdf",
+    "docx-to-pdf",
+    "image-to-pdf",
+    "pdf-tools",
+    "client-side",
+    "privacy-first"
+  ],
+  "author": "Renan",
+  "license": "MIT",
+  "dependencies": {
+    "html2canvas": "^1.4.1",
+    "jszip": "^3.10.1",
+    "mammoth": "^1.13.0",
+    "pdf-lib": "^1.17.1",
+    "sortablejs": "^1.15.2"
+  }
+}

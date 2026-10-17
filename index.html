@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PDF Studio Web | Mesclador, Conversor DOCX & Ferramentas</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Bibliotecas locais na pasta vendor/ (100% offline, compatível com file:// e sem bloqueios de CDN) -->
+  <script src="vendor/sortable.min.js"></script>
+  <script src="vendor/pdf-lib.min.js"></script>
+  <script src="vendor/pdf.min.js"></script>
+  <script src="vendor/mammoth.min.js"></script>
+  <script src="vendor/html2canvas.min.js"></script>
+  <script src="vendor/jszip.min.js"></script>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Cabeçalho -->
+    <header class="app-header">
+      <div class="logo-area">
+        <div class="logo-icon">
+          <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <path d="M9 15h6"></path>
+            <path d="M9 18h6"></path>
+            <path d="M9 12h2"></path>
+          </svg>
+        </div>
+        <div>
+          <h1>PDF Studio Web</h1>
+          <p class="subtitle">Mescle, converta DOCX, imagens e edite seus PDFs com privacidade total</p>
+        </div>
+      </div>
+      <div class="privacy-badge">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+        </svg>
+        <span>100% no navegador &bull; Seus arquivos não saem do seu computador</span>
+      </div>
+    </header>
+
+    <!-- Navegação por Abas -->
+    <nav class="nav-tabs" role="tablist">
+      <button type="button" class="tab-btn active" id="tabBtnMerger" data-target="tabMerger">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="7" height="9" rx="1"></rect>
+          <rect x="14" y="3" width="7" height="5" rx="1"></rect>
+          <rect x="14" y="12" width="7" height="9" rx="1"></rect>
+          <rect x="3" y="16" width="7" height="5" rx="1"></rect>
+        </svg>
+        Mesclador Multi-Formato
+      </button>
+      <button type="button" class="tab-btn" id="tabBtnTools" data-target="tabTools">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
+        </svg>
+        Conversões & Ferramentas
+      </button>
+    </nav>
+
+    <!-- ==================== ABA 1: MESCLADOR MULTI-FORMATO ==================== -->
+    <div class="tab-content active" id="tabMerger">
+      <!-- Área de Upload (Drag & Drop) -->
+      <section class="drop-zone" id="dropZone">
+        <input type="file" id="fileInput" accept=".pdf,.docx,.doc,.jpg,.jpeg,.png,.webp,.txt" multiple style="display: none;">
+        <div class="drop-zone-content">
+          <div class="upload-icon-circle">
+            <svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="17 8 12 3 7 8"></polyline>
+              <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+          </div>
+          <h3>Arraste e solte seus arquivos aqui</h3>
+          <p>Suporta <strong>PDF</strong>, <strong>DOCX (Word)</strong>, <strong>Imagens (JPG, PNG, WEBP)</strong> e <strong>Texto (.txt)</strong></p>
+          <div class="format-chips">
+            <span class="format-chip chip-pdf">PDF</span>
+            <span class="format-chip chip-docx">DOCX (Word)</span>
+            <span class="format-chip chip-img">JPG / PNG / WEBP</span>
+            <span class="format-chip chip-txt">TXT</span>
+          </div>
+          <button type="button" class="btn btn-secondary" id="browseBtn">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            Escolher arquivos
+          </button>
+        </div>
+      </section>
+
+      <!-- Barra de Ações da Lista -->
+      <section class="toolbar" id="toolbar" style="display: none;">
+        <div class="toolbar-info">
+          <span class="badge-count" id="fileCountBadge">0 arquivos</span>
+          <span class="text-muted" id="totalSizeText">0 KB</span>
+        </div>
+        <div class="toolbar-actions">
+          <button type="button" class="btn btn-ghost" id="addMoreBtn">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            Adicionar mais
+          </button>
+          <button type="button" class="btn btn-ghost danger" id="clearAllBtn">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="3 6 5 6 21 6"></polyline>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+            </svg>
+            Limpar lista
+          </button>
+        </div>
+      </section>
+
+      <!-- Dica de reordenação -->
+      <div class="tip-banner" id="tipBanner" style="display: none;">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="7 10 12 15 17 10"></polyline>
+          <line x1="12" y1="15" x2="12" y2="3"></line>
+        </svg>
+        <span><strong>Dica:</strong> Arraste os cards para reorganizar a ordem. Você também pode girar documentos e imagens individualmente!</span>
+      </div>
+
+      <!-- Lista Reordenável de Arquivos -->
+      <main class="file-list" id="fileList"></main>
+
+      <!-- Rodapé de Configurações e Exportação -->
+      <section class="export-card" id="exportCard" style="display: none;">
+        <div class="export-grid">
+          <div class="form-group">
+            <label for="outputFileName">Nome do arquivo final:</label>
+            <div class="input-with-suffix">
+              <input type="text" id="outputFileName" value="documento_unificado" placeholder="Nome do arquivo">
+              <span class="suffix">.pdf</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="pageLayoutSelect">Formato das imagens/textos:</label>
+            <select id="pageLayoutSelect" class="select-input">
+              <option value="a4" selected>Ajustar para Página A4 (Padrão)</option>
+              <option value="fit">Tamanho proporcional da imagem</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="export-actions">
+          <button type="button" class="btn btn-primary btn-large" id="mergeBtn">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="8 17 12 21 16 17"></polyline>
+              <line x1="12" y1="12" x2="12" y2="21"></line>
+              <path d="M20.88 18.09A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.29"></path>
+            </svg>
+            <span id="mergeBtnText">Juntar Tudo e Baixar PDF</span>
+          </button>
+        </div>
+
+        <!-- Barra de progresso -->
+        <div class="progress-container" id="progressContainer" style="display: none;">
+          <div class="progress-bar-bg">
+            <div class="progress-bar-fill" id="progressBar"></div>
+          </div>
+          <span class="progress-status" id="progressStatus">Processando páginas...</span>
+        </div>
+      </section>
+    </div>
+
+    <!-- ==================== ABA 2: FERRAMENTAS & CONVERSÕES ==================== -->
+    <div class="tab-content" id="tabTools" style="display: none;">
+      <div class="tools-intro">
+        <h2>Ferramentas Rápidas</h2>
+        <p>Converta, extraia e transforme seus documentos com facilidade</p>
+      </div>
+
+      <div class="tools-grid">
+        <!-- Ferramenta 1: DOCX para PDF -->
+        <div class="tool-card" id="toolDocxToPdf">
+          <div class="tool-icon tool-icon-blue">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+          </div>
+          <div class="tool-info">
+            <h3>Word (DOCX) para PDF</h3>
+            <p>Converta documentos Word (.docx) diretamente em PDF de alta qualidade</p>
+          </div>
+          <button type="button" class="btn btn-secondary tool-open-btn" data-tool="docx-pdf">Usar ferramenta &rarr;</button>
+        </div>
+
+        <!-- Ferramenta 2: PDF para Imagens (ZIP) -->
+        <div class="tool-card" id="toolPdfToImages">
+          <div class="tool-icon tool-icon-green">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <circle cx="8.5" cy="8.5" r="1.5"></circle>
+              <polyline points="21 15 16 10 5 21"></polyline>
+            </svg>
+          </div>
+          <div class="tool-info">
+            <h3>PDF para Imagens (ZIP)</h3>
+            <p>Converta todas as páginas do seu PDF em imagens PNG ou JPG compactadas em ZIP</p>
+          </div>
+          <button type="button" class="btn btn-secondary tool-open-btn" data-tool="pdf-images">Usar ferramenta &rarr;</button>
+        </div>
+
+        <!-- Ferramenta 3: Dividir / Extrair Páginas -->
+        <div class="tool-card" id="toolSplitPdf">
+          <div class="tool-icon tool-icon-purple">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="6" cy="6" r="3"></circle>
+              <circle cx="6" cy="18" r="3"></circle>
+              <line x1="20" y1="4" x2="8.12" y2="15.88"></line>
+              <line x1="14.47" y1="14.48" x2="20" y2="20"></line>
+              <line x1="8.12" y1="8.12" x2="12" y2="12"></line>
+            </svg>
+          </div>
+          <div class="tool-info">
+            <h3>Dividir / Extrair Páginas</h3>
+            <p>Selecione um intervalo de páginas (ex: 1-3, 5, 8) para salvar em um novo PDF</p>
+          </div>
+          <button type="button" class="btn btn-secondary tool-open-btn" data-tool="split-pdf">Usar ferramenta &rarr;</button>
+        </div>
+
+        <!-- Ferramenta 4: Girar Páginas do PDF -->
+        <div class="tool-card" id="toolRotatePdf">
+          <div class="tool-icon tool-icon-amber">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="23 4 23 10 17 10"></polyline>
+              <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+            </svg>
+          </div>
+          <div class="tool-info">
+            <h3>Girar Páginas de PDF</h3>
+            <p>Rotacione páginas em 90°, 180° ou 270° com apenas um clique</p>
+          </div>
+          <button type="button" class="btn btn-secondary tool-open-btn" data-tool="rotate-pdf">Usar ferramenta &rarr;</button>
+        </div>
+
+        <!-- Ferramenta 5: PDF para Texto (TXT) -->
+        <div class="tool-card" id="toolPdfToTxt">
+          <div class="tool-icon tool-icon-red">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+            </svg>
+          </div>
+          <div class="tool-info">
+            <h3>PDF para Texto (TXT)</h3>
+            <p>Extraia todo o texto legível do seu documento PDF para um arquivo .txt</p>
+          </div>
+          <button type="button" class="btn btn-secondary tool-open-btn" data-tool="pdf-txt">Usar ferramenta &rarr;</button>
+        </div>
+
+        <!-- Ferramenta 6: Imagens para PDF Direto -->
+        <div class="tool-card" id="toolImagesToPdf">
+          <div class="tool-icon tool-icon-teal">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+              <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+              <line x1="12" y1="22.08" x2="12" y2="12"></line>
+            </svg>
+          </div>
+          <div class="tool-info">
+            <h3>Imagens para PDF</h3>
+            <p>Converta fotos JPG, PNG ou WEBP em um documento PDF limpo e formatado</p>
+          </div>
+          <button type="button" class="btn btn-secondary tool-open-btn" data-tool="img-pdf">Usar ferramenta &rarr;</button>
+        </div>
+      </div>
+
+      <!-- Modal / Painel da Ferramenta Ativa -->
+      <div class="tool-modal" id="toolModal" style="display: none;">
+        <div class="tool-modal-backdrop" id="toolModalBackdrop"></div>
+        <div class="tool-modal-dialog">
+          <div class="tool-modal-header">
+            <h3 id="modalToolTitle">Título da Ferramenta</h3>
+            <button type="button" class="btn-icon" id="closeModalBtn" title="Fechar">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          </div>
+          <div class="tool-modal-body" id="modalToolBody">
+            <!-- Conteúdo dinâmico injetado via JS -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Área invisível para renderização offscreen de DOCX e HTML para Canvas -->
+    <div id="docxOffscreenContainer" class="docx-offscreen-container"></div>
+
+    <!-- Feedback e Notificações (Toast) -->
+    <div id="toast" class="toast"></div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
