@@ -1,5 +1,5 @@
 // ==========================================================================
-// Componente: Modal de Ajuste de Imagem e Filtros NAPS2 (App.ImageAdjustModal)
+// Componente: Modal de Ajuste e Filtros de Imagem (App.ImageAdjustModal)
 // ==========================================================================
 
 window.App = window.App || {};

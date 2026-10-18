@@ -40,8 +40,8 @@ App.SavePdfModal = (function () {
   async function executeSave() {
     const scope = pdfExportScope ? pdfExportScope.value : 'all';
     const layout = pdfPageLayout ? pdfPageLayout.value : 'a4';
-    let filename = pdfFileName ? pdfFileName.value.trim() : 'documento_naps2';
-    if (!filename) filename = 'documento_naps2';
+    let filename = pdfFileName ? pdfFileName.value.trim() : 'documento_unificado';
+    if (!filename) filename = 'documento_unificado';
     if (!filename.toLowerCase().endsWith('.pdf')) filename += '.pdf';
 
     const targetPages = scope === 'selected' ? App.State.getSelectedPages() : App.State.getPages();

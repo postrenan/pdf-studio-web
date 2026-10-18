@@ -1,11 +1,11 @@
-# 📄 PDF Studio Web (NAPS2 Web Edition)
+# 📄 PDF Studio Web
 
 <p align="center">
-  <strong>A experiência completa do NAPS2 (Not Another PDF Scanner 2) diretamente no seu navegador, 100% offline, gratuito e com privacidade total.</strong>
+  <strong>A experiência completa para digitalização, OCR e edição de PDFs diretamente no seu navegador, 100% offline, gratuito e com privacidade total.</strong>
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Vers%C3%A3o-2.0%20NAPS2%20Edition-blue.svg" alt="Versão 2.0">
+  <img src="https://img.shields.io/badge/Vers%C3%A3o-2.0-blue.svg" alt="Versão 2.0">
   <img src="https://img.shields.io/badge/Licen%C3%A7a-MIT-green.svg" alt="Licença MIT">
   <img src="https://img.shields.io/badge/Processamento-100%25%20Navegador%20(Local)-brightgreen.svg" alt="100% Client-side">
   <img src="https://img.shields.io/badge/Privacidade-Absoluta-success.svg" alt="Privacidade Total">
@@ -20,7 +20,7 @@ Acesse e use agora mesmo sem instalar nada:
 
 ---
 
-## 🧰 Recursos Inspirados no NAPS2
+## 🧰 Recursos e Funcionalidades
 
 ### 1. 📷 Digitalização (Scanner & Câmera)
 - **Captura com Câmera / WebCam**: Digitalize documentos físicos usando sua webcam ou a câmera do celular/tablet com alta resolução.
@@ -54,7 +54,7 @@ Dê um clique duplo em qualquer página ou use o botão **Ajustar Imagem**:
 ---
 
 ### 4. 🔀 Organização Avançada & Duplex Manual
-- **Intercalar Duplex (Assinatura NAPS2)**: O recurso mais famoso do NAPS2 para quem tem scanner comum sem frente e verso automático. Escaneie todas as frentes (1, 3, 5...), depois o verso (2, 4, 6... ou 6, 4, 2...), e o botão **Intercalar Duplex** reorganiza tudo perfeitamente (1, 2, 3, 4, 5, 6)!
+- **Intercalar Duplex**: Para quem tem scanner comum sem frente e verso automático. Escaneie todas as frentes (1, 3, 5...), depois o verso (2, 4, 6... ou 6, 4, 2...), e o botão **Intercalar Duplex** reorganiza tudo perfeitamente (1, 2, 3, 4, 5, 6)!
 - **Desintercalar**: Separa páginas ímpares e pares em duas metades.
 - **Inverter Ordem (Reverse)**: Inverte a ordem das páginas do documento.
 - **Girar & Espelhar**: Gire 90° à direita, 90° à esquerda, 180° e espelhe horizontalmente ou verticalmente.

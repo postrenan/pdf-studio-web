@@ -228,7 +228,7 @@ App.Ribbon = (function () {
           p.drawImage(embedded, { x: 0, y: 0, width: 595.28, height: 841.89 });
         }
         const bytes = await pdfDoc.save();
-        const file = new File([bytes], 'documento_naps2.pdf', { type: 'application/pdf' });
+        const file = new File([bytes], 'documento_digitalizado.pdf', { type: 'application/pdf' });
         await navigator.share({ title: 'Documento Digitalizado', files: [file] });
         App.Utils.showToast('Compartilhado com sucesso!', 'success');
       } catch (e) {

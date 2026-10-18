@@ -111,7 +111,7 @@ App.PdfService = (function () {
     if (metaTitle) pdfDoc.setTitle(metaTitle);
     if (metaAuthor) pdfDoc.setAuthor(metaAuthor);
     if (metaSubject) pdfDoc.setSubject(metaSubject);
-    pdfDoc.setCreator('PDF Studio Web (NAPS2 Edition)');
+    pdfDoc.setCreator('PDF Studio Web');
 
     const a4Width = 595.28;
     const a4Height = 841.89;

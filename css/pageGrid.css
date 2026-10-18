@@ -51,7 +51,7 @@
   gap: 12px;
 }
 
-/* Grade de Miniaturas de Páginas (NAPS2 Page Grid) */
+/* Grade de Miniaturas de Páginas */
 .naps-page-grid {
   flex-grow: 1;
   padding: 20px;
