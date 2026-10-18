@@ -909,71 +909,86 @@ h1 {
   }
 }
 
-/* ==================== RODAPÉ INFORMATIVO LGPD & ARMAZENAMENTO ==================== */
-.naps-footer {
-  margin-top: auto;
+/* ==================== BANNER / MODAL FLUTUANTE DE LGPD ==================== */
+.lgpd-floating-modal {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 92%;
+  max-width: 660px;
   background-color: #ffffff;
-  border-top: 1px solid var(--border-color);
-  padding: 24px 20px 16px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  z-index: 2500;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease;
+  animation: slideUpFloating 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.lgpd-floating-modal.hidden {
+  transform: translate(-50%, 150%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+@keyframes slideUpFloating {
+  from { transform: translate(-50%, 100%); opacity: 0; }
+  to { transform: translate(-50%, 0); opacity: 1; }
+}
+
+.lgpd-floating-content {
+  padding: 18px 20px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
-}
-
-.lgpd-banner {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 16px;
-  max-width: 1200px;
-  margin: 0 auto;
-  width: 100%;
-}
-
-.lgpd-card {
-  display: flex;
-  align-items: flex-start;
   gap: 12px;
-  background-color: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: var(--radius-md);
-  padding: 14px 16px;
 }
 
-.lgpd-icon {
-  background-color: #ecfdf5;
-  color: #059669;
-  border-radius: 8px;
-  width: 36px;
-  height: 36px;
+.lgpd-floating-header {
   display: flex;
   align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
+  justify-content: space-between;
 }
 
-.lgpd-card h4 {
-  font-size: 0.85rem;
+.lgpd-floating-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.95rem;
   font-weight: 700;
   color: var(--text-main);
-  margin-bottom: 4px;
 }
 
-.lgpd-card p {
-  font-size: 0.78rem;
+.lgpd-floating-body p {
+  font-size: 0.82rem;
+  line-height: 1.5;
   color: var(--text-muted);
-  line-height: 1.4;
 }
 
-.footer-bottom-bar {
+.lgpd-floating-body strong {
+  color: var(--text-main);
+}
+
+.lgpd-floating-footer {
   display: flex;
   align-items: center;
   justify-content: space-between;
   border-top: 1px solid #f1f5f9;
   padding-top: 12px;
-  font-size: 0.8rem;
+  margin-top: 4px;
+}
+
+/* Rodapé Minimalista */
+.naps-footer-minimal {
+  margin-top: auto;
+  background-color: #ffffff;
+  border-top: 1px solid var(--border-color);
+  padding: 8px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.75rem;
   color: var(--text-muted);
-  flex-wrap: wrap;
-  gap: 10px;
 }
 
 .footer-link-btn {
@@ -981,7 +996,7 @@ h1 {
   border: none;
   color: var(--primary);
   font-weight: 700;
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   cursor: pointer;
   padding: 0;
   transition: color 0.15s;

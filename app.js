@@ -100,6 +100,10 @@ const modalBatchSplit = document.getElementById('modalBatchSplit');
 const modalLgpd = document.getElementById('modalLgpd');
 const btnOpenLgpd = document.getElementById('btnOpenLgpd');
 const btnFooterLgpd = document.getElementById('btnFooterLgpd');
+const lgpdFloatingBanner = document.getElementById('lgpdFloatingBanner');
+const btnDismissLgpd = document.getElementById('btnDismissLgpd');
+const btnCloseLgpdFloating = document.getElementById('btnCloseLgpdFloating');
+const btnDetailsLgpd = document.getElementById('btnDetailsLgpd');
 
 // Câmera / Scanner
 const scanVideo = document.getElementById('scanVideo');
@@ -209,8 +213,38 @@ function setupRibbonEvents() {
     downloadBlob(new Blob([text], { type: 'text/plain;charset=utf-8' }), 'ocr_texto.txt');
   });
 
-  if (btnOpenLgpd) btnOpenLgpd.addEventListener('click', () => openModal(modalLgpd));
-  if (btnFooterLgpd) btnFooterLgpd.addEventListener('click', () => openModal(modalLgpd));
+  setupLgpdBanner();
+}
+
+function setupLgpdBanner() {
+  if (!lgpdFloatingBanner) return;
+
+  // Se já foi dispensado anteriormente, oculta
+  if (localStorage.getItem('lgpd_modal_dismissed') === 'true') {
+    lgpdFloatingBanner.classList.add('hidden');
+  }
+
+  const dismiss = () => {
+    lgpdFloatingBanner.classList.add('hidden');
+    localStorage.setItem('lgpd_modal_dismissed', 'true');
+    showToast('Preferência salva. Privacidade e LGPD respeitadas!', 'success');
+  };
+
+  if (btnDismissLgpd) btnDismissLgpd.addEventListener('click', dismiss);
+  if (btnCloseLgpdFloating) btnCloseLgpdFloating.addEventListener('click', dismiss);
+
+  if (btnDetailsLgpd) {
+    btnDetailsLgpd.addEventListener('click', () => {
+      openModal(modalLgpd);
+    });
+  }
+
+  if (btnOpenLgpd) {
+    btnOpenLgpd.addEventListener('click', () => openModal(modalLgpd));
+  }
+  if (btnFooterLgpd) {
+    btnFooterLgpd.addEventListener('click', () => openModal(modalLgpd));
+  }
 }
 
 // ==========================================================================

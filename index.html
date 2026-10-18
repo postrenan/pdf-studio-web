@@ -601,54 +601,36 @@
       </div>
     </div>
 
-    <!-- ==================== RODAPÉ INFORMATIVO LGPD & ARMAZENAMENTO ==================== -->
-    <footer class="naps-footer">
-      <div class="lgpd-banner">
-        <div class="lgpd-card">
-          <div class="lgpd-icon">
-            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+    <!-- ==================== BANNER / MODAL FLUTUANTE DE LGPD ==================== -->
+    <div class="lgpd-floating-modal" id="lgpdFloatingBanner">
+      <div class="lgpd-floating-content">
+        <div class="lgpd-floating-header">
+          <div class="lgpd-floating-title">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#16a34a" stroke-width="2">
               <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
             </svg>
+            <strong>Privacidade, Armazenamento e LGPD</strong>
           </div>
-          <div>
-            <h4>Conformidade LGPD (Lei 13.709/2018)</h4>
-            <p>Seus documentos e dados pessoais pertencem exclusivamente a você. Respeito total à sua privacidade.</p>
-          </div>
+          <button type="button" class="modal-close" id="btnCloseLgpdFloating" title="Fechar">&times;</button>
+        </div>
+        
+        <div class="lgpd-floating-body">
+          <p>
+            <strong>100% no seu navegador:</strong> Este aplicativo não possui servidores de armazenamento. Todos os arquivos e OCR são processados <strong>exclusivamente na memória RAM do seu dispositivo</strong>, em total conformidade com a <strong>LGPD (Lei 13.709/2018)</strong>. Nenhum dado é salvo ou enviado para a internet.
+          </p>
         </div>
 
-        <div class="lgpd-card">
-          <div class="lgpd-icon">
-            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
-              <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
-              <line x1="6" y1="6" x2="6.01" y2="6"></line>
-              <line x1="6" y1="18" x2="6.01" y2="18"></line>
-            </svg>
-          </div>
-          <div>
-            <h4>Zero Armazenamento em Servidor</h4>
-            <p>100% Client-Side: todo o processamento de PDFs, imagens e OCR ocorre na memória RAM do seu navegador.</p>
-          </div>
-        </div>
-
-        <div class="lgpd-card">
-          <div class="lgpd-icon">
-            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="10"></circle>
-              <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line>
-            </svg>
-          </div>
-          <div>
-            <h4>Sem Rastreamento ou Cookies</h4>
-            <p>Sem telemetria, sem cookies de terceiros e sem coleta de informações de identificação pessoal.</p>
-          </div>
+        <div class="lgpd-floating-footer">
+          <button type="button" class="footer-link-btn" id="btnDetailsLgpd">Ler detalhes completos</button>
+          <button type="button" class="btn btn-primary" id="btnDismissLgpd">OK, Entendi</button>
         </div>
       </div>
+    </div>
 
-      <div class="footer-bottom-bar">
-        <span>&copy; 2026 PDF Studio Web &bull; Código Aberto sob Licença MIT</span>
-        <button type="button" class="footer-link-btn" id="btnFooterLgpd">Ler Política Completa de Privacidade & LGPD &rarr;</button>
-      </div>
+    <!-- Rodapé Minimalista -->
+    <footer class="naps-footer-minimal">
+      <span>&copy; 2026 PDF Studio Web &bull; Código Aberto (MIT)</span>
+      <button type="button" class="footer-link-btn" id="btnFooterLgpd">Privacidade & LGPD</button>
     </footer>
 
     <!-- ==================== MODAL 6: DECLARAÇÃO DE PRIVACIDADE & LGPD ==================== -->
