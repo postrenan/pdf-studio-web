@@ -97,6 +97,9 @@ const modalImageAdjust = document.getElementById('modalImageAdjust');
 const modalSavePdf = document.getElementById('modalSavePdf');
 const modalOcr = document.getElementById('modalOcr');
 const modalBatchSplit = document.getElementById('modalBatchSplit');
+const modalLgpd = document.getElementById('modalLgpd');
+const btnOpenLgpd = document.getElementById('btnOpenLgpd');
+const btnFooterLgpd = document.getElementById('btnFooterLgpd');
 
 // Câmera / Scanner
 const scanVideo = document.getElementById('scanVideo');
@@ -205,6 +208,9 @@ function setupRibbonEvents() {
     const text = document.getElementById('ocrResultText').value;
     downloadBlob(new Blob([text], { type: 'text/plain;charset=utf-8' }), 'ocr_texto.txt');
   });
+
+  if (btnOpenLgpd) btnOpenLgpd.addEventListener('click', () => openModal(modalLgpd));
+  if (btnFooterLgpd) btnFooterLgpd.addEventListener('click', () => openModal(modalLgpd));
 }
 
 // ==========================================================================

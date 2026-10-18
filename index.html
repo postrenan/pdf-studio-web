@@ -37,12 +37,12 @@
           <p class="subtitle">Digitalização, organização por páginas, OCR e edição de PDFs 100% no seu navegador</p>
         </div>
       </div>
-      <div class="privacy-badge">
+      <button type="button" class="privacy-badge clickable" id="btnOpenLgpd" title="Clique para ver a Política de Privacidade e Conformidade LGPD">
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
         </svg>
-        <span>100% Privado &bull; Processamento local</span>
-      </div>
+        <span>100% no Navegador &bull; Conformidade LGPD &bull; Zero Armazenamento</span>
+      </button>
     </header>
 
     <!-- Barra de Ferramentas Principal (Estilo Ribbon do NAPS2) -->
@@ -596,6 +596,124 @@
           <div class="modal-footer-actions">
             <button type="button" class="btn btn-secondary" data-close="modalBatchSplit">Cancelar</button>
             <button type="button" class="btn btn-primary" id="btnConfirmBatchSplit">Dividir e Baixar (ZIP)</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== RODAPÉ INFORMATIVO LGPD & ARMAZENAMENTO ==================== -->
+    <footer class="naps-footer">
+      <div class="lgpd-banner">
+        <div class="lgpd-card">
+          <div class="lgpd-icon">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            </svg>
+          </div>
+          <div>
+            <h4>Conformidade LGPD (Lei 13.709/2018)</h4>
+            <p>Seus documentos e dados pessoais pertencem exclusivamente a você. Respeito total à sua privacidade.</p>
+          </div>
+        </div>
+
+        <div class="lgpd-card">
+          <div class="lgpd-icon">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
+              <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
+              <line x1="6" y1="6" x2="6.01" y2="6"></line>
+              <line x1="6" y1="18" x2="6.01" y2="18"></line>
+            </svg>
+          </div>
+          <div>
+            <h4>Zero Armazenamento em Servidor</h4>
+            <p>100% Client-Side: todo o processamento de PDFs, imagens e OCR ocorre na memória RAM do seu navegador.</p>
+          </div>
+        </div>
+
+        <div class="lgpd-card">
+          <div class="lgpd-icon">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line>
+            </svg>
+          </div>
+          <div>
+            <h4>Sem Rastreamento ou Cookies</h4>
+            <p>Sem telemetria, sem cookies de terceiros e sem coleta de informações de identificação pessoal.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bottom-bar">
+        <span>&copy; 2026 PDF Studio Web &bull; Código Aberto sob Licença MIT</span>
+        <button type="button" class="footer-link-btn" id="btnFooterLgpd">Ler Política Completa de Privacidade & LGPD &rarr;</button>
+      </div>
+    </footer>
+
+    <!-- ==================== MODAL 6: DECLARAÇÃO DE PRIVACIDADE & LGPD ==================== -->
+    <div class="modal-overlay" id="modalLgpd" style="display: none;">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-header">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#16a34a" stroke-width="2">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            </svg>
+            <h3>Política de Privacidade e Conformidade LGPD</h3>
+          </div>
+          <button type="button" class="modal-close" data-close="modalLgpd">&times;</button>
+        </div>
+        <div class="modal-body legal-text-body">
+          <div class="legal-badge">
+            Lei Geral de Proteção de Dados Pessoais (LGPD) &ndash; Lei Federal nº 13.709/2018
+          </div>
+
+          <section class="legal-section">
+            <h4>1. Arquitetura 100% do Lado do Cliente (Client-Side Only)</h4>
+            <p>
+              O <strong>PDF Studio Web</strong> foi desenvolvido segundo o princípio de <em>Privacy by Design</em> (Privacidade desde a Concepção). A aplicação não possui backend, servidor de banco de dados ou sistemas de armazenamento remoto para os seus arquivos.
+            </p>
+            <p>
+              Qualquer arquivo que você arrastar, abrir, digitalizar com a câmera, converter ou processar com OCR é manipulado <strong>exclusivamente na memória temporária (RAM) do seu próprio dispositivo</strong> através de bibliotecas JavaScript locais (WebAssembly e HTML5 File API).
+            </p>
+          </section>
+
+          <section class="legal-section">
+            <h4>2. Armazenamento e Retenção de Dados</h4>
+            <p>
+              <strong>Não retemos, não gravamos e não temos acesso a nenhum dos seus documentos.</strong>
+            </p>
+            <ul>
+              <li><strong>Zero Persistência em Nuvem:</strong> Seus arquivos nunca transitam pela internet nem são enviados a qualquer servidor ou provedor de hospedagem.</li>
+              <li><strong>Descarte Imediato:</strong> Ao fechar ou recarregar a aba do navegador, todos os dados, imagens e textos na memória são instantaneamente destruídos pelo próprio navegador.</li>
+              <li><strong>Documentos Sensíveis e Confidenciais:</strong> Contratos, holerites, prontuários médicos, comprovantes fiscais e documentos de identidade podem ser processados com total segurança e sigilo, pois permanecem isolados na sua máquina.</li>
+            </ul>
+          </section>
+
+          <section class="legal-section">
+            <h4>3. Ausência de Cookies de Rastreamento e Telemetria</h4>
+            <p>
+              Em estrita conformidade com os artigos 6º (Princípios) e 7º da LGPD:
+            </p>
+            <ul>
+              <li>Não utilizamos cookies de publicidade, analítica comportamental ou rastreadores de terceiros.</li>
+              <li>Não coletamos endereço IP, localização geográfica nem identificadores únicos do usuário.</li>
+              <li>O motor de OCR (Tesseract) executa localmente no seu navegador através de Web Workers.</li>
+            </ul>
+          </section>
+
+          <section class="legal-section">
+            <h4>4. Direitos dos Titulares de Dados (Artigo 18 da LGPD)</h4>
+            <p>
+              A LGPD assegura aos titulares direitos como confirmação da existência de tratamento, acesso, correção, anonimização, bloqueio ou eliminação de dados.
+            </p>
+            <p>
+              Como o <strong>PDF Studio Web</strong> não coleta nem armazena quaisquer dados pessoais de seus usuários, o exercício do direito de eliminação é automático e permanente pelo próprio usuário ao encerrar a sessão.
+            </p>
+          </section>
+
+          <div class="modal-footer-actions">
+            <button type="button" class="btn btn-primary" data-close="modalLgpd">Entendi e Concordo</button>
           </div>
         </div>
       </div>

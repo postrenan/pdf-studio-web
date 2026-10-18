@@ -75,10 +75,15 @@ Dê um clique duplo em qualquer página ou use o botão **Ajustar Imagem**:
 - **Imprimir**: Envie as páginas diretamente para a impressora com formatação limpa (<kbd>Ctrl</kbd>+<kbd>P</kbd>).
 - **Compartilhar**: Envio rápido via Web Share API ou e-mail.
 
----
+## 🛡️ Conformidade com a LGPD e Armazenamento de Dados
 
-## 🔒 100% Privado e Seguro
-Todos os arquivos permanecem na memória do seu próprio navegador. **Nenhum arquivo é enviado para servidores externos.**
+O **PDF Studio Web** segue rigorosamente os princípios da **Lei Geral de Proteção de Dados Pessoais (LGPD &ndash; Lei Federal nº 13.709/2018)**:
+
+- 🔒 **Zero Armazenamento em Servidor (Zero-Storage Policy)**: A aplicação não possui backend, banco de dados ou sistemas de armazenamento em nuvem. Todo o processamento (mesclagem, conversão, OCR, tratamento de imagens) é realizado **exclusivamente na memória RAM local do seu navegador**.
+- 🚫 **Sem Rastreamento ou Telemetria**: Não utilizamos cookies de rastreamento, Google Analytics, pixels ou identificadores pessoais.
+- 🗑️ **Descarte Imediato**: Ao fechar ou atualizar a aba, todos os arquivos manipulados são destruídos da memória pelo navegador.
+- 💼 **Documentos Sensíveis e Confidenciais**: Contratos, holerites, certidões, documentos de identidade e exames médicos podem ser manipulados com garantia absoluta de sigilo, pois nenhum dado transita pela internet.
+- ⚖️ **Direitos do Titular (Art. 18 da LGPD)**: Como nenhum dado pessoal é armazenado ou retido pela aplicação, o controle do usuário sobre seus arquivos é pleno, instantâneo e irrevogável.
 
 ---
 
