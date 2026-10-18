@@ -1,104 +1,100 @@
-# 📄 PDF Studio Web
+# 📄 PDF Studio Web (NAPS2 Web Edition)
 
 <p align="center">
-  <strong>Uma suíte web completa, moderna e 100% privada para mesclar, converter e manipular PDFs diretamente no seu navegador.</strong>
+  <strong>A experiência completa do NAPS2 (Not Another PDF Scanner 2) diretamente no seu navegador, 100% offline, gratuito e com privacidade total.</strong>
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Licen%C3%A7a-MIT-blue.svg" alt="Licença MIT">
-  <img src="https://img.shields.io/badge/Processamento-100%25%20Client--Side-brightgreen.svg" alt="100% Client-side">
-  <img src="https://img.shields.io/badge/Privacidade-Total-success.svg" alt="Privacidade Total">
-  <img src="https://img.shields.io/badge/Depend%C3%AAncias-Offline%20Vendored-orange.svg" alt="Offline">
+  <img src="https://img.shields.io/badge/Vers%C3%A3o-2.0%20NAPS2%20Edition-blue.svg" alt="Versão 2.0">
+  <img src="https://img.shields.io/badge/Licen%C3%A7a-MIT-green.svg" alt="Licença MIT">
+  <img src="https://img.shields.io/badge/Processamento-100%25%20Navegador%20(Local)-brightgreen.svg" alt="100% Client-side">
+  <img src="https://img.shields.io/badge/Privacidade-Absoluta-success.svg" alt="Privacidade Total">
 </p>
 
 ---
 
 ## 🌐 Demonstração Online (GitHub Pages)
 
-Você pode usar o aplicativo diretamente online, sem instalar nada:
+Acesse e use agora mesmo sem instalar nada:
 👉 **[https://postrenan.github.io/pdf-studio-web/](https://postrenan.github.io/pdf-studio-web/)**
 
 ---
 
-## 🔒 Privacidade e Segurança em Primeiro Lugar
+## 🧰 Recursos Inspirados no NAPS2
 
-Diferente da maioria das ferramentas online de PDF:
-- **Nenhum arquivo é enviado para servidores externos.**
-- Todo o processamento (conversão, leitura de texto, renderização e mesclagem) ocorre **exclusivamente na memória RAM do seu navegador**.
-- Os arquivos e miniaturas continuam 100% seguros na sua própria máquina.
-- Funciona perfeitamente mesmo **sem conexão com a internet**.
-
----
-
-## ✨ Funcionalidades
-
-### 1. 🔀 Mesclador Multi-Formato com Drag & Drop
-- **Misture diferentes extensões**: Arraste arquivos de vários tipos para a mesma lista:
-  - 📕 **PDF** (`.pdf`)
-  - 📘 **Word** (`.docx`, `.doc`)
-  - 📗 **Imagens** (`.jpg`, `.jpeg`, `.png`, `.webp`, `.bmp`)
-  - 📙 **Texto** (`.txt`)
-- **Reordenação Livre**: Arraste os cards para definir exatamente a ordem final das páginas no documento unificado.
-- **Giro Individual de Páginas**: Botão em cada card para girar PDFs ou fotos em 90°, 180° ou 270°.
-- **Ajuste de Formato**: Escolha entre ajustar imagens proporcionalmente para folha padrão A4 ou manter as dimensões originais.
-- **Miniaturas em Tempo Real**: Pré-visualize a capa de cada arquivo antes de mesclar.
+### 1. 📷 Digitalização (Scanner & Câmera)
+- **Captura com Câmera / WebCam**: Digitalize documentos físicos usando sua webcam ou a câmera do celular/tablet com alta resolução.
+- **Perfis de Digitalização**:
+  - 🎨 *Colorido*: Documentos com fotos e ilustrações.
+  - 📄 *Preto e Branco / Texto*: Alto contraste e binarização para recibos e textos nítidos sem ruído de fundo.
+  - 🌫️ *Tons de Cinza*: Documentos monocromáticos suaves.
 
 ---
 
-### 2. 🧰 Central de Conversões e Ferramentas Rápidas
+### 2. 📑 Grade Visual de Miniaturas por Página
+- **Desempacotamento Individual**: Ao importar um PDF ou documento com várias páginas, cada página vira um card interativo separado.
+- **Arraste e Solte (Drag & Drop)**: Reorganize a ordem das páginas livremente.
+- **Slider de Zoom**: Ajuste o tamanho das miniaturas das páginas conforme sua preferência.
+- **Seleção Múltipla**: Selecione várias páginas com clique, <kbd>Ctrl</kbd>+Clique, <kbd>Shift</kbd>+Clique ou <kbd>Ctrl</kbd>+<kbd>A</kbd>.
 
-Aba dedicada com ferramentas práticas de 1 clique:
+---
 
-| Ferramenta | Descrição |
-|---|---|
-| 📝 **Word (DOCX) para PDF** | Converte documentos `.docx` em arquivos PDF formatados de alta resolução. |
-| 🖼️ **PDF para Imagens (ZIP)** | Extrai todas as páginas de um PDF como imagens PNG ou JPG e baixa tudo compactado em `.zip`. |
-| ✂️ **Dividir / Extrair Páginas** | Extrai intervalos selecionados (ex: `1-3, 5, 8-10`) gerando um novo PDF separado. |
-| 🔄 **Girar Páginas do PDF** | Rotaciona todas as páginas do PDF em 90°, 180° ou 270°. |
-| 📋 **PDF para Texto (.txt)** | Extrai todo o conteúdo de texto do documento para um arquivo `.txt`. |
-| 📸 **Imagens para PDF** | Agrupa múltiplas fotos em um único arquivo PDF com paginação limpa. |
+### 3. 🎨 Tratamento & Ajuste de Imagem (Image Editor)
+Dê um clique duplo em qualquer página ou use o botão **Ajustar Imagem**:
+- **Modos de Cor**:
+  - *Colorido Original*
+  - *Tons de Cinza*
+  - *Preto e Branco (Limiar / Binarização)* com slider de sensibilidade ajustável para limpar sombras e manchas de digitalização.
+  - *Inverter Cores (Negativo)*
+- **Brilho e Contraste**: Sliders em tempo real (-100% a +100%).
+- **Desentortar (Deskew)**: Rotação fina livre de -25° a +25° para corrigir folhas digitalizadas tortas.
+- **Recorte de Margens (Crop)**: Ajuste de bordas superior, inferior, esquerda e direita.
+- **Aplicação em Lote**: Aplique os mesmos ajustes em todas as páginas selecionadas de uma vez só!
+
+---
+
+### 4. 🔀 Organização Avançada & Duplex Manual
+- **Intercalar Duplex (Assinatura NAPS2)**: O recurso mais famoso do NAPS2 para quem tem scanner comum sem frente e verso automático. Escaneie todas as frentes (1, 3, 5...), depois o verso (2, 4, 6... ou 6, 4, 2...), e o botão **Intercalar Duplex** reorganiza tudo perfeitamente (1, 2, 3, 4, 5, 6)!
+- **Desintercalar**: Separa páginas ímpares e pares em duas metades.
+- **Inverter Ordem (Reverse)**: Inverte a ordem das páginas do documento.
+- **Girar & Espelhar**: Gire 90° à direita, 90° à esquerda, 180° e espelhe horizontalmente ou verticalmente.
+- **Duplicar e Excluir**: Duplique páginas ou remova com a tecla <kbd>Delete</kbd>.
+
+---
+
+### 5. 🔍 OCR (Reconhecimento Óptico de Caracteres)
+- Motor **Tesseract.js** embutido para reconhecer texto em imagens e documentos digitalizados em Português, Inglês ou Espanhol.
+- Copie o texto com um clique ou baixe como arquivo `.txt`.
+
+---
+
+### 6. 💾 Salvar, Exportar & Imprimir
+- **Salvar PDF**: Com opções de metadados do documento (Título, Autor, Assunto), escolha de páginas (todas ou apenas selecionadas) e formato (A4 proporcional ou tamanho original).
+- **Salvar Imagens**: Exporte todas as páginas como imagens JPEG de alta qualidade compactadas em `.zip`.
+- **Dividir em Lotes (Batch Split)**: Separe automaticamente seu documento a cada N páginas ou gere um PDF individual para cada página.
+- **Imprimir**: Envie as páginas diretamente para a impressora com formatação limpa (<kbd>Ctrl</kbd>+<kbd>P</kbd>).
+- **Compartilhar**: Envio rápido via Web Share API ou e-mail.
+
+---
+
+## 🔒 100% Privado e Seguro
+Todos os arquivos permanecem na memória do seu próprio navegador. **Nenhum arquivo é enviado para servidores externos.**
 
 ---
 
 ## 🚀 Como Executar Localmente
 
-### Opção 1: Sem Instalação (Mais Simples)
-Clone o repositório ou baixe o ZIP e dê dois cliques no arquivo [`index.html`](./index.html):
-```bash
-git clone https://github.com/postrenan/pdf-studio-web.git
-cd pdf-studio-web
-# Abra o index.html no navegador
-```
+### Opção 1: Sem Instalação
+Basta dar dois cliques no arquivo [`index.html`](./index.html) em qualquer navegador moderno.
 
-### Opção 2: Servidor Local com Node.js
+### Opção 2: Servidor Local
 ```bash
 npm start
+# ou: npx serve .
+# ou: python -m http.server 8080
 ```
-Ou:
-```bash
-npx serve .
-```
-
-### Opção 3: Servidor Local com Python
-```bash
-python -m http.server 8080
-```
-Acesse `http://localhost:8080` no navegador.
-
----
-
-## 🛠️ Tecnologias e Bibliotecas Utilizadas
-
-Todas as bibliotecas estão pré-instaladas localmente na pasta `vendor/` para garantir funcionamento offline e conformidade com políticas de segurança:
-- [**pdf-lib**](https://pdf-lib.js.org/): Criação, mesclagem e rotação vetorial de documentos PDF.
-- [**PDF.js (Mozilla)**](https://mozilla.github.io/pdf.js/): Renderização das páginas, geração de miniaturas e extração de texto.
-- [**Mammoth.js**](https://github.com/mwilliamson/mammoth.js): Conversão e parsing de arquivos Word `.docx` para HTML estruturado.
-- [**html2canvas**](https://html2canvas.hertzen.com/): Renderização de documentos em páginas A4 com alta fidelidade visual.
-- [**JSZip**](https://stuk.github.io/jszip/): Compactação das imagens extraídas de PDFs em arquivos ZIP.
-- [**SortableJS**](https://sortablejs.github.io/Sortable/): Reordenação fluida e acessível via arrastar e soltar (Drag & Drop).
 
 ---
 
 ## 📄 Licença
-
-Este projeto está sob a licença [MIT](LICENSE). Você pode utilizar, modificar e distribuir livremente.
+Distribuído sob a licença [MIT](LICENSE).

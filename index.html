@@ -3,307 +3,609 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PDF Studio Web | Mesclador, Conversor DOCX & Ferramentas</title>
+  <title>PDF Studio Web - O NAPS2 Completo no seu Navegador</title>
   <link rel="stylesheet" href="styles.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   
-  <!-- Bibliotecas locais na pasta vendor/ (100% offline, compatível com file:// e sem bloqueios de CDN) -->
+  <!-- Bibliotecas locais na pasta vendor/ (100% offline e privado) -->
   <script src="vendor/sortable.min.js"></script>
   <script src="vendor/pdf-lib.min.js"></script>
   <script src="vendor/pdf.min.js"></script>
   <script src="vendor/mammoth.min.js"></script>
   <script src="vendor/html2canvas.min.js"></script>
   <script src="vendor/jszip.min.js"></script>
+  <script src="vendor/tesseract.min.js"></script>
 </head>
 <body>
-  <div class="app-container">
-    <!-- Cabeçalho -->
-    <header class="app-header">
+  <div class="naps-container">
+    <!-- Cabeçalho Superior -->
+    <header class="naps-header">
       <div class="logo-area">
         <div class="logo-icon">
-          <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-            <polyline points="14 2 14 8 20 8"></polyline>
-            <path d="M9 15h6"></path>
-            <path d="M9 18h6"></path>
-            <path d="M9 12h2"></path>
+          <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+            <line x1="8" y1="21" x2="16" y2="21"></line>
+            <line x1="12" y1="17" x2="12" y2="21"></line>
+            <line x1="6" y1="8" x2="18" y2="8"></line>
+            <line x1="6" y1="12" x2="14" y2="12"></line>
           </svg>
         </div>
         <div>
-          <h1>PDF Studio Web</h1>
-          <p class="subtitle">Mescle, converta DOCX, imagens e edite seus PDFs com privacidade total</p>
+          <h1>PDF Studio Web <span class="badge-tag">NAPS2 Web Edition</span></h1>
+          <p class="subtitle">Digitalização, organização por páginas, OCR e edição de PDFs 100% no seu navegador</p>
         </div>
       </div>
       <div class="privacy-badge">
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
         </svg>
-        <span>100% no navegador &bull; Seus arquivos não saem do seu computador</span>
+        <span>100% Privado &bull; Processamento local</span>
       </div>
     </header>
 
-    <!-- Navegação por Abas -->
-    <nav class="nav-tabs" role="tablist">
-      <button type="button" class="tab-btn active" id="tabBtnMerger" data-target="tabMerger">
-        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
-          <rect x="3" y="3" width="7" height="9" rx="1"></rect>
-          <rect x="14" y="3" width="7" height="5" rx="1"></rect>
-          <rect x="14" y="12" width="7" height="9" rx="1"></rect>
-          <rect x="3" y="16" width="7" height="5" rx="1"></rect>
-        </svg>
-        Mesclador Multi-Formato
-      </button>
-      <button type="button" class="tab-btn" id="tabBtnTools" data-target="tabTools">
-        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
-        </svg>
-        Conversões & Ferramentas
-      </button>
+    <!-- Barra de Ferramentas Principal (Estilo Ribbon do NAPS2) -->
+    <nav class="naps-ribbon">
+      <div class="ribbon-group">
+        <div class="ribbon-label">Captura & Importação</div>
+        <div class="ribbon-buttons">
+          <button type="button" class="ribbon-btn primary" id="btnScan">
+            <div class="ribbon-icon">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                <circle cx="12" cy="13" r="4"></circle>
+              </svg>
+            </div>
+            <span>Digitalizar</span>
+          </button>
+          <button type="button" class="ribbon-btn" id="btnImport">
+            <div class="ribbon-icon">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+            </div>
+            <span>Importar</span>
+          </button>
+          <input type="file" id="hiddenFileInput" accept=".pdf,.docx,.doc,.jpg,.jpeg,.png,.webp,.bmp,.txt" multiple style="display: none;">
+        </div>
+      </div>
+
+      <div class="ribbon-divider"></div>
+
+      <div class="ribbon-group">
+        <div class="ribbon-label">Salvar & Exportar</div>
+        <div class="ribbon-buttons">
+          <button type="button" class="ribbon-btn success" id="btnSavePdf" title="Salvar todas as páginas ou páginas selecionadas em PDF">
+            <div class="ribbon-icon">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="12" y1="18" x2="12" y2="12"></line>
+                <polyline points="9 15 12 18 15 15"></polyline>
+              </svg>
+            </div>
+            <span>Salvar PDF</span>
+          </button>
+          <button type="button" class="ribbon-btn" id="btnSaveImages" title="Salvar páginas como imagens JPEG/PNG (ZIP)">
+            <div class="ribbon-icon">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                <polyline points="21 15 16 10 5 21"></polyline>
+              </svg>
+            </div>
+            <span>Salvar Imagens</span>
+          </button>
+          <button type="button" class="ribbon-btn" id="btnPrint" title="Imprimir páginas selecionadas diretamente">
+            <div class="ribbon-icon">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                <rect x="6" y="14" width="12" height="8"></rect>
+              </svg>
+            </div>
+            <span>Imprimir</span>
+          </button>
+          <button type="button" class="ribbon-btn" id="btnShare" title="Compartilhar ou enviar por e-mail">
+            <div class="ribbon-icon">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="18" cy="5" r="3"></circle>
+                <circle cx="6" cy="12" r="3"></circle>
+                <circle cx="18" cy="19" r="3"></circle>
+                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+              </svg>
+            </div>
+            <span>Compartilhar</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="ribbon-divider"></div>
+
+      <div class="ribbon-group">
+        <div class="ribbon-label">Edição & Ferramentas NAPS2</div>
+        <div class="ribbon-buttons">
+          <button type="button" class="ribbon-btn" id="btnImageAdjust" title="Ajustes de imagem: Brilho, Contraste, Tons de Cinza, Limiar P&B e Desentortar">
+            <div class="ribbon-icon">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="9"></circle>
+                <path d="M12 3v18"></path>
+                <path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor"></path>
+              </svg>
+            </div>
+            <span>Ajustar Imagem</span>
+          </button>
+          <button type="button" class="ribbon-btn" id="btnOcr" title="Reconhecimento Óptico de Caracteres (OCR) com Tesseract">
+            <div class="ribbon-icon">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                <line x1="8" y1="11" x2="14" y2="11"></line>
+                <line x1="11" y1="8" x2="11" y2="14"></line>
+              </svg>
+            </div>
+            <span>OCR Texto</span>
+          </button>
+          <button type="button" class="ribbon-btn" id="btnBatchSplit" title="Dividir documento em lotes de páginas">
+            <div class="ribbon-icon">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="6" cy="6" r="3"></circle>
+                <circle cx="6" cy="18" r="3"></circle>
+                <line x1="20" y1="4" x2="8.12" y2="15.88"></line>
+                <line x1="14.47" y1="14.48" x2="20" y2="20"></line>
+                <line x1="8.12" y1="8.12" x2="12" y2="12"></line>
+              </svg>
+            </div>
+            <span>Dividir Lotes</span>
+          </button>
+        </div>
+      </div>
     </nav>
 
-    <!-- ==================== ABA 1: MESCLADOR MULTI-FORMATO ==================== -->
-    <div class="tab-content active" id="tabMerger">
-      <!-- Área de Upload (Drag & Drop) -->
-      <section class="drop-zone" id="dropZone">
-        <input type="file" id="fileInput" accept=".pdf,.docx,.doc,.jpg,.jpeg,.png,.webp,.txt" multiple style="display: none;">
-        <div class="drop-zone-content">
-          <div class="upload-icon-circle">
-            <svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-              <polyline points="17 8 12 3 7 8"></polyline>
-              <line x1="12" y1="3" x2="12" y2="15"></line>
+    <!-- Barra Secundária: Operações de Páginas (Girar, Inverter, Intercalar, Selecionar, Zoom) -->
+    <section class="page-action-bar">
+      <div class="action-bar-left">
+        <!-- Rotação e Orientação -->
+        <div class="btn-group" title="Rotações">
+          <button type="button" class="tool-btn" id="btnRotateRight" title="Girar 90° à Direita (Horário)">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="23 4 23 10 17 10"></polyline>
+              <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
             </svg>
-          </div>
-          <h3>Arraste e solte seus arquivos aqui</h3>
-          <p>Suporta <strong>PDF</strong>, <strong>DOCX (Word)</strong>, <strong>Imagens (JPG, PNG, WEBP)</strong> e <strong>Texto (.txt)</strong></p>
-          <div class="format-chips">
-            <span class="format-chip chip-pdf">PDF</span>
-            <span class="format-chip chip-docx">DOCX (Word)</span>
-            <span class="format-chip chip-img">JPG / PNG / WEBP</span>
-            <span class="format-chip chip-txt">TXT</span>
-          </div>
-          <button type="button" class="btn btn-secondary" id="browseBtn">
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
-              <line x1="12" y1="5" x2="12" y2="19"></line>
-              <line x1="5" y1="12" x2="19" y2="12"></line>
+            <span>Girar 90° ↻</span>
+          </button>
+          <button type="button" class="tool-btn" id="btnRotateLeft" title="Girar 90° à Esquerda (Anti-horário)">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="1 4 1 10 7 10"></polyline>
+              <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
             </svg>
-            Escolher arquivos
+            <span>90° ↺</span>
+          </button>
+          <button type="button" class="tool-btn" id="btnRotate180" title="Girar 180°">
+            <span>180°</span>
+          </button>
+          <button type="button" class="tool-btn" id="btnFlipH" title="Espelhar Horizontalmente">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="8 4 4 8 8 12"></polyline>
+              <polyline points="16 4 20 8 16 12"></polyline>
+              <line x1="4" y1="8" x2="20" y2="8"></line>
+              <line x1="12" y1="2" x2="12" y2="22"></line>
+            </svg>
+          </button>
+          <button type="button" class="tool-btn" id="btnFlipV" title="Espelhar Verticalmente">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="4 8 8 4 12 8"></polyline>
+              <polyline points="4 16 8 20 12 16"></polyline>
+              <line x1="8" y1="4" x2="8" y2="20"></line>
+              <line x1="2" y1="12" x2="22" y2="12"></line>
+            </svg>
           </button>
         </div>
-      </section>
 
-      <!-- Barra de Ações da Lista -->
-      <section class="toolbar" id="toolbar" style="display: none;">
-        <div class="toolbar-info">
-          <span class="badge-count" id="fileCountBadge">0 arquivos</span>
-          <span class="text-muted" id="totalSizeText">0 KB</span>
-        </div>
-        <div class="toolbar-actions">
-          <button type="button" class="btn btn-ghost" id="addMoreBtn">
+        <div class="bar-separator"></div>
+
+        <!-- Ferramentas Clássicas NAPS2: Intercalar Duplex e Inverter -->
+        <div class="btn-group">
+          <button type="button" class="tool-btn" id="btnInterleave" title="Intercalar páginas para digitalização frente e verso manual (ex: 1, 3, 5 com 2, 4, 6)">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="4" y1="6" x2="20" y2="6"></line>
+              <line x1="4" y1="12" x2="20" y2="12"></line>
+              <line x1="4" y1="18" x2="20" y2="18"></line>
+            </svg>
+            <span>Intercalar Duplex</span>
+          </button>
+          <button type="button" class="tool-btn" id="btnDeinterleave" title="Desintercalar páginas ímpares e pares">
+            <span>Desintercalar</span>
+          </button>
+          <button type="button" class="tool-btn" id="btnReverse" title="Inverter ordem das páginas selecionadas ou de todas">
             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
               <line x1="12" y1="5" x2="12" y2="19"></line>
-              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="19 12 12 19 5 12"></polyline>
             </svg>
-            Adicionar mais
+            <span>Inverter Ordem</span>
           </button>
-          <button type="button" class="btn btn-ghost danger" id="clearAllBtn">
+        </div>
+
+        <div class="bar-separator"></div>
+
+        <!-- Mover / Duplicar / Excluir -->
+        <div class="btn-group">
+          <button type="button" class="tool-btn" id="btnMoveUp" title="Mover selecionadas para cima / esquerda">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="18 15 12 9 6 15"></polyline>
+            </svg>
+          </button>
+          <button type="button" class="tool-btn" id="btnMoveDown" title="Mover selecionadas para baixo / direita">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </button>
+          <button type="button" class="tool-btn" id="btnDuplicate" title="Duplicar páginas selecionadas">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+            <span>Duplicar</span>
+          </button>
+          <button type="button" class="tool-btn danger" id="btnDeleteSelected" title="Excluir páginas selecionadas (Del)">
             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
               <polyline points="3 6 5 6 21 6"></polyline>
               <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
             </svg>
-            Limpar lista
+            <span>Excluir</span>
           </button>
         </div>
-      </section>
-
-      <!-- Dica de reordenação -->
-      <div class="tip-banner" id="tipBanner" style="display: none;">
-        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
-          <polyline points="7 10 12 15 17 10"></polyline>
-          <line x1="12" y1="15" x2="12" y2="3"></line>
-        </svg>
-        <span><strong>Dica:</strong> Arraste os cards para reorganizar a ordem. Você também pode girar documentos e imagens individualmente!</span>
       </div>
 
-      <!-- Lista Reordenável de Arquivos -->
-      <main class="file-list" id="fileList"></main>
+      <div class="action-bar-right">
+        <!-- Controle de Zoom da Grade de Miniaturas -->
+        <div class="zoom-slider-wrapper" title="Ajustar tamanho das miniaturas das páginas">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            <line x1="8" y1="11" x2="14" y2="11"></line>
+          </svg>
+          <input type="range" id="zoomRange" min="100" max="280" value="160" step="10">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            <line x1="11" y1="8" x2="11" y2="14"></line>
+            <line x1="8" y1="11" x2="14" y2="11"></line>
+          </svg>
+        </div>
+      </div>
+    </section>
 
-      <!-- Rodapé de Configurações e Exportação -->
-      <section class="export-card" id="exportCard" style="display: none;">
-        <div class="export-grid">
+    <!-- Barra de Status de Seleção -->
+    <div class="selection-status-bar">
+      <div class="selection-stats">
+        <span id="pageCountText"><strong>0</strong> páginas no documento</span>
+        <span class="selection-indicator" id="selectionCountText">Nenhuma selecionada</span>
+      </div>
+      <div class="selection-actions">
+        <button type="button" class="link-btn" id="btnSelectAll">Selecionar Tudo (Ctrl+A)</button>
+        <button type="button" class="link-btn" id="btnDeselectAll">Desmarcar</button>
+        <button type="button" class="link-btn" id="btnInvertSelection">Inverter Seleção</button>
+        <button type="button" class="link-btn danger" id="btnClearAllPages">Limpar Tudo</button>
+      </div>
+    </div>
+
+    <!-- Banner Inicial de Arrastar / Soltar -->
+    <div class="naps-empty-state" id="emptyState">
+      <div class="empty-icon-circle">
+        <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <line x1="12" y1="18" x2="12" y2="12"></line>
+          <line x1="9" y1="15" x2="15" y2="15"></line>
+        </svg>
+      </div>
+      <h2>Nenhum documento carregado</h2>
+      <p>Arraste e solte seus arquivos <strong>PDF, Word (DOCX), Imagens ou TXT</strong> aqui,<br>ou clique em <strong>Digitalizar</strong> ou <strong>Importar</strong> na barra superior.</p>
+      <div class="empty-actions">
+        <button type="button" class="btn btn-primary" id="btnEmptyScan">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+            <circle cx="12" cy="13" r="4"></circle>
+          </svg>
+          Digitalizar com a Câmera
+        </button>
+        <button type="button" class="btn btn-secondary" id="btnEmptyBrowse">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          Selecionar Arquivos
+        </button>
+      </div>
+    </div>
+
+    <!-- Grade Visual de Miniaturas por Página (NAPS2 Page Grid) -->
+    <main class="naps-page-grid" id="pageGrid" style="display: none;"></main>
+
+    <!-- Barra de Progresso Global -->
+    <div class="progress-container" id="progressContainer" style="display: none;">
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progressBar"></div>
+      </div>
+      <span class="progress-status" id="progressStatus">Processando páginas...</span>
+    </div>
+
+    <!-- ==================== MODAL 1: DIGITALIZAR COM A CÂMERA (SCANNER) ==================== -->
+    <div class="modal-overlay" id="modalScan" style="display: none;">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-header">
+          <h3>Digitalizar Documento</h3>
+          <button type="button" class="modal-close" data-close="modalScan">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="scan-layout">
+            <div class="scan-preview-wrapper">
+              <video id="scanVideo" autoplay playsinline></video>
+              <canvas id="scanCaptureCanvas" style="display: none;"></canvas>
+              <div class="scan-guide-box"></div>
+            </div>
+            <div class="scan-controls-panel">
+              <div class="form-group">
+                <label for="scanProfileSelect">Perfil de Digitalização:</label>
+                <select id="scanProfileSelect" class="form-select">
+                  <option value="color" selected>Colorido (Documento / Foto)</option>
+                  <option value="bw">Preto e Branco / Texto (Alto Contraste)</option>
+                  <option value="gray">Tons de Cinza</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="scanCameraSelect">Câmera / Dispositivo:</label>
+                <select id="scanCameraSelect" class="form-select"></select>
+              </div>
+              <div class="scan-actions">
+                <button type="button" class="btn btn-primary btn-large" id="btnCaptureScan">
+                  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <circle cx="12" cy="12" r="3"></circle>
+                  </svg>
+                  Capturar Página
+                </button>
+                <button type="button" class="btn btn-secondary" data-close="modalScan">Concluir Digitalização</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== MODAL 2: AJUSTE DE IMAGEM & TRATAMENTO (NAPS2 IMAGE EDITOR) ==================== -->
+    <div class="modal-overlay" id="modalImageAdjust" style="display: none;">
+      <div class="modal-dialog modal-xl">
+        <div class="modal-header">
+          <h3>Ajuste e Tratamento de Imagem</h3>
+          <button type="button" class="modal-close" data-close="modalImageAdjust">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="adjust-layout">
+            <!-- Prévia interativa em canvas -->
+            <div class="adjust-canvas-container">
+              <canvas id="adjustPreviewCanvas"></canvas>
+            </div>
+            <!-- Painel de Filtros e Sliders -->
+            <div class="adjust-controls-container">
+              <div class="adjust-section">
+                <h4>Modo de Cor</h4>
+                <div class="radio-group">
+                  <label><input type="radio" name="colorMode" value="original" checked> Colorido Original</label>
+                  <label><input type="radio" name="colorMode" value="grayscale"> Tons de Cinza</label>
+                  <label><input type="radio" name="colorMode" value="bw"> Preto e Branco (Limiar / Binarização)</label>
+                  <label><input type="radio" name="colorMode" value="invert"> Inverter Cores (Negativo)</label>
+                </div>
+              </div>
+
+              <!-- Controle de Limiar (Threshold P&B) -->
+              <div class="adjust-section" id="thresholdSection" style="display: none;">
+                <div class="slider-header">
+                  <label>Sensibilidade do Limiar P&B:</label>
+                  <span id="thresholdVal">128</span>
+                </div>
+                <input type="range" id="thresholdSlider" min="30" max="220" value="128">
+                <small class="text-muted">Ajuste para limpar fundos escuros e deixar textos pretos perfeitos.</small>
+              </div>
+
+              <div class="adjust-section">
+                <div class="slider-header">
+                  <label>Brilho:</label>
+                  <span id="brightnessVal">0%</span>
+                </div>
+                <input type="range" id="brightnessSlider" min="-100" max="100" value="0">
+              </div>
+
+              <div class="adjust-section">
+                <div class="slider-header">
+                  <label>Contraste:</label>
+                  <span id="contrastVal">0%</span>
+                </div>
+                <input type="range" id="contrastSlider" min="-100" max="100" value="0">
+              </div>
+
+              <div class="adjust-section">
+                <div class="slider-header">
+                  <label>Desentortar (Deskew / Rotação Fina):</label>
+                  <span id="deskewVal">0°</span>
+                </div>
+                <input type="range" id="deskewSlider" min="-25" max="25" value="0" step="0.5">
+              </div>
+
+              <div class="adjust-section">
+                <h4>Recortar Margens (%)</h4>
+                <div class="crop-grid">
+                  <div>
+                    <label>Topo:</label>
+                    <input type="number" id="cropTop" min="0" max="40" value="0" class="crop-input">
+                  </div>
+                  <div>
+                    <label>Base:</label>
+                    <input type="number" id="cropBottom" min="0" max="40" value="0" class="crop-input">
+                  </div>
+                  <div>
+                    <label>Esquerda:</label>
+                    <input type="number" id="cropLeft" min="0" max="40" value="0" class="crop-input">
+                  </div>
+                  <div>
+                    <label>Direita:</label>
+                    <input type="number" id="cropRight" min="0" max="40" value="0" class="crop-input">
+                  </div>
+                </div>
+              </div>
+
+              <div class="adjust-btn-footer">
+                <button type="button" class="btn btn-secondary" id="btnResetAdjust">Restaurar Original</button>
+                <button type="button" class="btn btn-primary" id="btnApplyAdjust">Aplicar na(s) Página(s)</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== MODAL 3: SALVAR PDF (OPÇÕES, METADADOS & SENHA) ==================== -->
+    <div class="modal-overlay" id="modalSavePdf" style="display: none;">
+      <div class="modal-dialog">
+        <div class="modal-header">
+          <h3>Salvar como PDF</h3>
+          <button type="button" class="modal-close" data-close="modalSavePdf">&times;</button>
+        </div>
+        <div class="modal-body">
           <div class="form-group">
-            <label for="outputFileName">Nome do arquivo final:</label>
+            <label for="pdfFileName">Nome do Arquivo:</label>
             <div class="input-with-suffix">
-              <input type="text" id="outputFileName" value="documento_unificado" placeholder="Nome do arquivo">
+              <input type="text" id="pdfFileName" value="documento_digitalizado">
               <span class="suffix">.pdf</span>
             </div>
           </div>
+
           <div class="form-group">
-            <label for="pageLayoutSelect">Formato das imagens/textos:</label>
-            <select id="pageLayoutSelect" class="select-input">
-              <option value="a4" selected>Ajustar para Página A4 (Padrão)</option>
-              <option value="fit">Tamanho proporcional da imagem</option>
+            <label for="pdfExportScope">Páginas a Exportar:</label>
+            <select id="pdfExportScope" class="form-select">
+              <option value="all">Todas as páginas</option>
+              <option value="selected">Apenas as páginas selecionadas</option>
             </select>
           </div>
-        </div>
 
-        <div class="export-actions">
-          <button type="button" class="btn btn-primary btn-large" id="mergeBtn">
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="8 17 12 21 16 17"></polyline>
-              <line x1="12" y1="12" x2="12" y2="21"></line>
-              <path d="M20.88 18.09A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.29"></path>
-            </svg>
-            <span id="mergeBtnText">Juntar Tudo e Baixar PDF</span>
-          </button>
-        </div>
+          <div class="form-group">
+            <label for="pdfPageLayout">Formato da Página:</label>
+            <select id="pdfPageLayout" class="form-select">
+              <option value="a4" selected>Padrão A4 (Ajustar com margem)</option>
+              <option value="fit">Tamanho original da imagem / escaneamento</option>
+            </select>
+          </div>
 
-        <!-- Barra de progresso -->
-        <div class="progress-container" id="progressContainer" style="display: none;">
-          <div class="progress-bar-bg">
-            <div class="progress-bar-fill" id="progressBar"></div>
-          </div>
-          <span class="progress-status" id="progressStatus">Processando páginas...</span>
-        </div>
-      </section>
-    </div>
+          <!-- Metadados NAPS2 -->
+          <details class="naps-details">
+            <summary>Metadados do PDF (Título, Autor...)</summary>
+            <div class="details-content">
+              <div class="form-group">
+                <label for="pdfMetaTitle">Título:</label>
+                <input type="text" id="pdfMetaTitle" class="form-input" placeholder="Ex: Relatório Financeiro">
+              </div>
+              <div class="form-group">
+                <label for="pdfMetaAuthor">Autor:</label>
+                <input type="text" id="pdfMetaAuthor" class="form-input" placeholder="Seu nome ou empresa">
+              </div>
+              <div class="form-group">
+                <label for="pdfMetaSubject">Assunto:</label>
+                <input type="text" id="pdfMetaSubject" class="form-input" placeholder="Assunto do documento">
+              </div>
+            </div>
+          </details>
 
-    <!-- ==================== ABA 2: FERRAMENTAS & CONVERSÕES ==================== -->
-    <div class="tab-content" id="tabTools" style="display: none;">
-      <div class="tools-intro">
-        <h2>Ferramentas Rápidas</h2>
-        <p>Converta, extraia e transforme seus documentos com facilidade</p>
-      </div>
-
-      <div class="tools-grid">
-        <!-- Ferramenta 1: DOCX para PDF -->
-        <div class="tool-card" id="toolDocxToPdf">
-          <div class="tool-icon tool-icon-blue">
-            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-              <polyline points="14 2 14 8 20 8"></polyline>
-              <line x1="16" y1="13" x2="8" y2="13"></line>
-              <line x1="16" y1="17" x2="8" y2="17"></line>
-              <polyline points="10 9 9 9 8 9"></polyline>
-            </svg>
-          </div>
-          <div class="tool-info">
-            <h3>Word (DOCX) para PDF</h3>
-            <p>Converta documentos Word (.docx) diretamente em PDF de alta qualidade</p>
-          </div>
-          <button type="button" class="btn btn-secondary tool-open-btn" data-tool="docx-pdf">Usar ferramenta &rarr;</button>
-        </div>
-
-        <!-- Ferramenta 2: PDF para Imagens (ZIP) -->
-        <div class="tool-card" id="toolPdfToImages">
-          <div class="tool-icon tool-icon-green">
-            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-              <circle cx="8.5" cy="8.5" r="1.5"></circle>
-              <polyline points="21 15 16 10 5 21"></polyline>
-            </svg>
-          </div>
-          <div class="tool-info">
-            <h3>PDF para Imagens (ZIP)</h3>
-            <p>Converta todas as páginas do seu PDF em imagens PNG ou JPG compactadas em ZIP</p>
-          </div>
-          <button type="button" class="btn btn-secondary tool-open-btn" data-tool="pdf-images">Usar ferramenta &rarr;</button>
-        </div>
-
-        <!-- Ferramenta 3: Dividir / Extrair Páginas -->
-        <div class="tool-card" id="toolSplitPdf">
-          <div class="tool-icon tool-icon-purple">
-            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="6" cy="6" r="3"></circle>
-              <circle cx="6" cy="18" r="3"></circle>
-              <line x1="20" y1="4" x2="8.12" y2="15.88"></line>
-              <line x1="14.47" y1="14.48" x2="20" y2="20"></line>
-              <line x1="8.12" y1="8.12" x2="12" y2="12"></line>
-            </svg>
-          </div>
-          <div class="tool-info">
-            <h3>Dividir / Extrair Páginas</h3>
-            <p>Selecione um intervalo de páginas (ex: 1-3, 5, 8) para salvar em um novo PDF</p>
-          </div>
-          <button type="button" class="btn btn-secondary tool-open-btn" data-tool="split-pdf">Usar ferramenta &rarr;</button>
-        </div>
-
-        <!-- Ferramenta 4: Girar Páginas do PDF -->
-        <div class="tool-card" id="toolRotatePdf">
-          <div class="tool-icon tool-icon-amber">
-            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="23 4 23 10 17 10"></polyline>
-              <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
-            </svg>
-          </div>
-          <div class="tool-info">
-            <h3>Girar Páginas de PDF</h3>
-            <p>Rotacione páginas em 90°, 180° ou 270° com apenas um clique</p>
-          </div>
-          <button type="button" class="btn btn-secondary tool-open-btn" data-tool="rotate-pdf">Usar ferramenta &rarr;</button>
-        </div>
-
-        <!-- Ferramenta 5: PDF para Texto (TXT) -->
-        <div class="tool-card" id="toolPdfToTxt">
-          <div class="tool-icon tool-icon-red">
-            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-              <polyline points="14 2 14 8 20 8"></polyline>
-              <line x1="16" y1="13" x2="8" y2="13"></line>
-              <line x1="16" y1="17" x2="8" y2="17"></line>
-            </svg>
-          </div>
-          <div class="tool-info">
-            <h3>PDF para Texto (TXT)</h3>
-            <p>Extraia todo o texto legível do seu documento PDF para um arquivo .txt</p>
-          </div>
-          <button type="button" class="btn btn-secondary tool-open-btn" data-tool="pdf-txt">Usar ferramenta &rarr;</button>
-        </div>
-
-        <!-- Ferramenta 6: Imagens para PDF Direto -->
-        <div class="tool-card" id="toolImagesToPdf">
-          <div class="tool-icon tool-icon-teal">
-            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
-              <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
-              <line x1="12" y1="22.08" x2="12" y2="12"></line>
-            </svg>
-          </div>
-          <div class="tool-info">
-            <h3>Imagens para PDF</h3>
-            <p>Converta fotos JPG, PNG ou WEBP em um documento PDF limpo e formatado</p>
-          </div>
-          <button type="button" class="btn btn-secondary tool-open-btn" data-tool="img-pdf">Usar ferramenta &rarr;</button>
-        </div>
-      </div>
-
-      <!-- Modal / Painel da Ferramenta Ativa -->
-      <div class="tool-modal" id="toolModal" style="display: none;">
-        <div class="tool-modal-backdrop" id="toolModalBackdrop"></div>
-        <div class="tool-modal-dialog">
-          <div class="tool-modal-header">
-            <h3 id="modalToolTitle">Título da Ferramenta</h3>
-            <button type="button" class="btn-icon" id="closeModalBtn" title="Fechar">
-              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
-                <line x1="18" y1="6" x2="6" y2="18"></line>
-                <line x1="6" y1="6" x2="18" y2="18"></line>
-              </svg>
-            </button>
-          </div>
-          <div class="tool-modal-body" id="modalToolBody">
-            <!-- Conteúdo dinâmico injetado via JS -->
+          <div class="modal-footer-actions">
+            <button type="button" class="btn btn-secondary" data-close="modalSavePdf">Cancelar</button>
+            <button type="button" class="btn btn-primary" id="btnConfirmSavePdf">Gerar e Baixar PDF</button>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Área invisível para renderização offscreen de DOCX e HTML para Canvas -->
-    <div id="docxOffscreenContainer" class="docx-offscreen-container"></div>
+    <!-- ==================== MODAL 4: OCR (RECONHECIMENTO DE TEXTO) ==================== -->
+    <div class="modal-overlay" id="modalOcr" style="display: none;">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-header">
+          <h3>Reconhecimento Óptico de Caracteres (OCR)</h3>
+          <button type="button" class="modal-close" data-close="modalOcr">&times;</button>
+        </div>
+        <div class="modal-body">
+          <p class="text-muted">Extraia texto pesquisável de fotos e documentos escaneados diretamente no navegador com Tesseract OCR.</p>
+          <div class="form-group">
+            <label for="ocrLanguage">Idioma do Documento:</label>
+            <select id="ocrLanguage" class="form-select">
+              <option value="por" selected>Português</option>
+              <option value="eng">Inglês</option>
+              <option value="spa">Espanhol</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="ocrScope">Aplicar em:</label>
+            <select id="ocrScope" class="form-select">
+              <option value="all">Todas as páginas</option>
+              <option value="selected">Páginas selecionadas</option>
+            </select>
+          </div>
+          <button type="button" class="btn btn-primary" id="btnStartOcr">Iniciar Reconhecimento OCR</button>
 
-    <!-- Feedback e Notificações (Toast) -->
+          <div id="ocrProgressWrapper" style="display: none; margin-top: 16px;">
+            <div class="progress-bar-bg">
+              <div class="progress-bar-fill" id="ocrProgressBar"></div>
+            </div>
+            <span class="progress-status" id="ocrProgressStatus">Iniciando motor Tesseract...</span>
+          </div>
+
+          <div class="form-group" id="ocrResultWrapper" style="display: none; margin-top: 16px;">
+            <label for="ocrResultText">Texto Reconhecido:</label>
+            <textarea id="ocrResultText" rows="8" class="form-textarea" readonly></textarea>
+            <div class="modal-footer-actions" style="margin-top: 8px;">
+              <button type="button" class="btn btn-secondary" id="btnCopyOcrText">Copiar Texto</button>
+              <button type="button" class="btn btn-primary" id="btnDownloadOcrTxt">Baixar como .TXT</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== MODAL 5: DIVIDIR EM LOTES (BATCH SPLIT) ==================== -->
+    <div class="modal-overlay" id="modalBatchSplit" style="display: none;">
+      <div class="modal-dialog">
+        <div class="modal-header">
+          <h3>Dividir Documento em Lotes</h3>
+          <button type="button" class="modal-close" data-close="modalBatchSplit">&times;</button>
+        </div>
+        <div class="modal-body">
+          <p class="text-muted">Separe automaticamente as páginas em múltiplos arquivos PDF ou pastas.</p>
+          <div class="form-group">
+            <label for="batchSplitType">Método de Divisão:</label>
+            <select id="batchSplitType" class="form-select">
+              <option value="every-n" selected>A cada número fixo de páginas</option>
+              <option value="single-pages">Cada página em um PDF separado</option>
+            </select>
+          </div>
+          <div class="form-group" id="batchPagesPerDocGroup">
+            <label for="batchPagesPerDoc">Páginas por documento:</label>
+            <input type="number" id="batchPagesPerDoc" value="2" min="1" max="100" class="form-input">
+          </div>
+          <div class="modal-footer-actions">
+            <button type="button" class="btn btn-secondary" data-close="modalBatchSplit">Cancelar</button>
+            <button type="button" class="btn btn-primary" id="btnConfirmBatchSplit">Dividir e Baixar (ZIP)</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast de Notificação -->
     <div id="toast" class="toast"></div>
+
+    <!-- Área Invisível para Renderização DOCX / TXT / Print -->
+    <div id="offscreenRenderer" class="offscreen-renderer"></div>
   </div>
 
   <script src="app.js"></script>

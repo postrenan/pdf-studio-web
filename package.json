@@ -21,6 +21,7 @@
     "jszip": "^3.10.1",
     "mammoth": "^1.13.0",
     "pdf-lib": "^1.17.1",
-    "sortablejs": "^1.15.2"
+    "sortablejs": "^1.15.2",
+    "tesseract.js": "^7.0.0"
   }
 }

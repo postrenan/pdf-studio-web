@@ -1,5 +1,5 @@
 // ==========================================================================
-// PDF Studio Web - Aplicação Completa Offline
+// PDF Studio Web - Motor NAPS2 Completo (Client-Side & Offline)
 // ==========================================================================
 
 // Configuração do Worker do PDF.js
@@ -11,1085 +11,1457 @@ if (window.pdfjsLib) {
   }
 }
 
-// Estado global do Mesclador
-let filesData = []; // Array: { id, file, name, size, type, pageCount, thumbUrl, rotation, docxHtml, rawText }
-let sortableInstance = null;
+// ==========================================================================
+// Estado Global da Aplicação (Páginas Individuais no estilo NAPS2)
+// ==========================================================================
+let pages = []; 
+// Estrutura de cada página:
+// {
+//   id: string,
+//   sourceName: string,
+//   sourceType: string,
+//   originalCanvas: HTMLCanvasElement,
+//   processedCanvas: HTMLCanvasElement,
+//   thumbUrl: string,
+//   width: number,
+//   height: number,
+//   rotation: number,      // 0, 90, 180, 270
+//   flipH: boolean,
+//   flipV: boolean,
+//   colorMode: string,     // 'original', 'grayscale', 'bw', 'invert'
+//   threshold: number,     // 30..220
+//   brightness: number,    // -100..100
+//   contrast: number,      // -100..100
+//   deskew: number,        // -25..25 deg
+//   crop: { top: 0, bottom: 0, left: 0, right: 0 },
+//   selected: boolean,
+//   text: string
+// }
 
-// Elementos do DOM - Navegação
-const tabBtnMerger = document.getElementById('tabBtnMerger');
-const tabBtnTools = document.getElementById('tabBtnTools');
-const tabMerger = document.getElementById('tabMerger');
-const tabTools = document.getElementById('tabTools');
+let sortableGrid = null;
+let activeCameraStream = null;
+let editingPageIndex = -1;
 
-// Elementos do DOM - Mesclador
-const dropZone = document.getElementById('dropZone');
-const fileInput = document.getElementById('fileInput');
-const browseBtn = document.getElementById('browseBtn');
-const fileList = document.getElementById('fileList');
-const toolbar = document.getElementById('toolbar');
-const tipBanner = document.getElementById('tipBanner');
-const exportCard = document.getElementById('exportCard');
-const fileCountBadge = document.getElementById('fileCountBadge');
-const totalSizeText = document.getElementById('totalSizeText');
-const addMoreBtn = document.getElementById('addMoreBtn');
-const clearAllBtn = document.getElementById('clearAllBtn');
-const mergeBtn = document.getElementById('mergeBtn');
-const mergeBtnText = document.getElementById('mergeBtnText');
-const outputFileName = document.getElementById('outputFileName');
-const pageLayoutSelect = document.getElementById('pageLayoutSelect');
+// ==========================================================================
+// Elementos do DOM
+// ==========================================================================
+// Ribbon
+const btnScan = document.getElementById('btnScan');
+const btnImport = document.getElementById('btnImport');
+const hiddenFileInput = document.getElementById('hiddenFileInput');
+const btnSavePdf = document.getElementById('btnSavePdf');
+const btnSaveImages = document.getElementById('btnSaveImages');
+const btnPrint = document.getElementById('btnPrint');
+const btnShare = document.getElementById('btnShare');
+const btnImageAdjust = document.getElementById('btnImageAdjust');
+const btnOcr = document.getElementById('btnOcr');
+const btnBatchSplit = document.getElementById('btnBatchSplit');
+
+// Barra secundária
+const btnRotateRight = document.getElementById('btnRotateRight');
+const btnRotateLeft = document.getElementById('btnRotateLeft');
+const btnRotate180 = document.getElementById('btnRotate180');
+const btnFlipH = document.getElementById('btnFlipH');
+const btnFlipV = document.getElementById('btnFlipV');
+const btnInterleave = document.getElementById('btnInterleave');
+const btnDeinterleave = document.getElementById('btnDeinterleave');
+const btnReverse = document.getElementById('btnReverse');
+const btnMoveUp = document.getElementById('btnMoveUp');
+const btnMoveDown = document.getElementById('btnMoveDown');
+const btnDuplicate = document.getElementById('btnDuplicate');
+const btnDeleteSelected = document.getElementById('btnDeleteSelected');
+const zoomRange = document.getElementById('zoomRange');
+
+// Seleção e Status
+const pageCountText = document.getElementById('pageCountText');
+const selectionCountText = document.getElementById('selectionCountText');
+const btnSelectAll = document.getElementById('btnSelectAll');
+const btnDeselectAll = document.getElementById('btnDeselectAll');
+const btnInvertSelection = document.getElementById('btnInvertSelection');
+const btnClearAllPages = document.getElementById('btnClearAllPages');
+
+// Grade e Estados
+const emptyState = document.getElementById('emptyState');
+const pageGrid = document.getElementById('pageGrid');
+const btnEmptyScan = document.getElementById('btnEmptyScan');
+const btnEmptyBrowse = document.getElementById('btnEmptyBrowse');
 const progressContainer = document.getElementById('progressContainer');
 const progressBar = document.getElementById('progressBar');
 const progressStatus = document.getElementById('progressStatus');
-const docxOffscreen = document.getElementById('docxOffscreenContainer');
 const toastEl = document.getElementById('toast');
+const offscreenRenderer = document.getElementById('offscreenRenderer');
 
-// Elementos do DOM - Modal de Ferramentas
-const toolModal = document.getElementById('toolModal');
-const toolModalBackdrop = document.getElementById('toolModalBackdrop');
-const closeModalBtn = document.getElementById('closeModalBtn');
-const modalToolTitle = document.getElementById('modalToolTitle');
-const modalToolBody = document.getElementById('modalToolBody');
+// Modais
+const modalScan = document.getElementById('modalScan');
+const modalImageAdjust = document.getElementById('modalImageAdjust');
+const modalSavePdf = document.getElementById('modalSavePdf');
+const modalOcr = document.getElementById('modalOcr');
+const modalBatchSplit = document.getElementById('modalBatchSplit');
+
+// Câmera / Scanner
+const scanVideo = document.getElementById('scanVideo');
+const scanCameraSelect = document.getElementById('scanCameraSelect');
+const scanProfileSelect = document.getElementById('scanProfileSelect');
+const btnCaptureScan = document.getElementById('btnCaptureScan');
+
+// Ajuste de Imagem
+const adjustPreviewCanvas = document.getElementById('adjustPreviewCanvas');
+const colorModeRadios = document.querySelectorAll('input[name="colorMode"]');
+const thresholdSection = document.getElementById('thresholdSection');
+const thresholdSlider = document.getElementById('thresholdSlider');
+const thresholdVal = document.getElementById('thresholdVal');
+const brightnessSlider = document.getElementById('brightnessSlider');
+const brightnessVal = document.getElementById('brightnessVal');
+const contrastSlider = document.getElementById('contrastSlider');
+const contrastVal = document.getElementById('contrastVal');
+const deskewSlider = document.getElementById('deskewSlider');
+const deskewVal = document.getElementById('deskewVal');
+const cropTop = document.getElementById('cropTop');
+const cropBottom = document.getElementById('cropBottom');
+const cropLeft = document.getElementById('cropLeft');
+const cropRight = document.getElementById('cropRight');
+const btnResetAdjust = document.getElementById('btnResetAdjust');
+const btnApplyAdjust = document.getElementById('btnApplyAdjust');
 
 // ==========================================================================
 // Inicialização
 // ==========================================================================
 document.addEventListener('DOMContentLoaded', () => {
-  setupTabs();
-  setupMergerEvents();
-  setupToolsEvents();
-  initSortable();
+  setupRibbonEvents();
+  setupPageActionEvents();
+  setupDragAndDrop();
+  setupModalDismissals();
+  setupKeyboardShortcuts();
+  initGridSortable();
+  setupZoomControl();
 });
 
 // ==========================================================================
-// Navegação por Abas
+// Configuração de Eventos da Ribbon Principal
 // ==========================================================================
-function setupTabs() {
-  const tabs = [
-    { btn: tabBtnMerger, content: tabMerger },
-    { btn: tabBtnTools, content: tabTools }
-  ];
+function setupRibbonEvents() {
+  btnImport.addEventListener('click', () => hiddenFileInput.click());
+  btnEmptyBrowse.addEventListener('click', () => hiddenFileInput.click());
 
-  tabs.forEach(t => {
-    t.btn.addEventListener('click', () => {
-      tabs.forEach(item => {
-        item.btn.classList.remove('active');
-        item.content.style.display = 'none';
-      });
-      t.btn.classList.add('active');
-      t.content.style.display = 'block';
-    });
-  });
-}
-
-// ==========================================================================
-// Eventos do Mesclador Multi-Formato
-// ==========================================================================
-function setupMergerEvents() {
-  browseBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    fileInput.click();
-  });
-
-  dropZone.addEventListener('click', () => {
-    fileInput.click();
-  });
-
-  addMoreBtn.addEventListener('click', () => {
-    fileInput.click();
-  });
-
-  fileInput.addEventListener('change', (e) => {
+  hiddenFileInput.addEventListener('change', (e) => {
     if (e.target.files && e.target.files.length > 0) {
-      handleIncomingFiles(Array.from(e.target.files));
-      fileInput.value = '';
+      importFiles(Array.from(e.target.files));
+      hiddenFileInput.value = '';
     }
   });
 
-  ['dragenter', 'dragover'].forEach(eventName => {
-    dropZone.addEventListener(eventName, (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      dropZone.classList.add('drag-over');
-    }, false);
-  });
+  btnScan.addEventListener('click', openScannerModal);
+  btnEmptyScan.addEventListener('click', openScannerModal);
+  btnCaptureScan.addEventListener('click', captureScanFrame);
 
-  ['dragleave', 'drop'].forEach(eventName => {
-    dropZone.addEventListener(eventName, (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      dropZone.classList.remove('drag-over');
-    }, false);
-  });
-
-  dropZone.addEventListener('drop', (e) => {
-    const dt = e.dataTransfer;
-    if (dt && dt.files && dt.files.length > 0) {
-      handleIncomingFiles(Array.from(dt.files));
+  btnSavePdf.addEventListener('click', () => {
+    if (pages.length === 0) {
+      showToast('Nenhuma página para salvar.', 'error');
+      return;
     }
+    openModal(modalSavePdf);
   });
 
-  window.addEventListener('dragover', (e) => e.preventDefault(), false);
-  window.addEventListener('drop', (e) => {
-    if (tabMerger.style.display !== 'none' && !dropZone.contains(e.target) && e.dataTransfer.files.length > 0) {
-      e.preventDefault();
-      handleIncomingFiles(Array.from(e.dataTransfer.files));
-    }
-  }, false);
+  document.getElementById('btnConfirmSavePdf').addEventListener('click', executeSavePdf);
 
-  clearAllBtn.addEventListener('click', () => {
-    if (filesData.length === 0) return;
-    if (confirm('Tem certeza que deseja limpar todos os arquivos da lista?')) {
-      filesData = [];
-      renderFileList();
-      updateUIState();
-      showToast('Lista limpa com sucesso', 'default');
+  btnSaveImages.addEventListener('click', executeSaveImages);
+  btnPrint.addEventListener('click', executePrintPages);
+  btnShare.addEventListener('click', executeShareDocument);
+
+  btnImageAdjust.addEventListener('click', () => {
+    const selected = getSelectedPages();
+    if (selected.length === 0 && pages.length === 0) {
+      showToast('Nenhuma página selecionada para ajuste.', 'error');
+      return;
     }
+    const targetIndex = selected.length > 0 ? pages.indexOf(selected[0]) : 0;
+    openImageAdjustModal(targetIndex);
   });
 
-  mergeBtn.addEventListener('click', executeUnifiedMerge);
+  btnOcr.addEventListener('click', () => {
+    if (pages.length === 0) {
+      showToast('Importe documentos ou fotos para realizar OCR.', 'error');
+      return;
+    }
+    openModal(modalOcr);
+  });
+
+  btnBatchSplit.addEventListener('click', () => {
+    if (pages.length === 0) {
+      showToast('Nenhuma página disponível para divisão.', 'error');
+      return;
+    }
+    openModal(modalBatchSplit);
+  });
+
+  document.getElementById('btnConfirmBatchSplit').addEventListener('click', executeBatchSplit);
+  document.getElementById('btnStartOcr').addEventListener('click', executeOcr);
+  document.getElementById('btnCopyOcrText').addEventListener('click', () => {
+    const text = document.getElementById('ocrResultText').value;
+    navigator.clipboard.writeText(text);
+    showToast('Texto copiado para a área de transferência!', 'success');
+  });
+  document.getElementById('btnDownloadOcrTxt').addEventListener('click', () => {
+    const text = document.getElementById('ocrResultText').value;
+    downloadBlob(new Blob([text], { type: 'text/plain;charset=utf-8' }), 'ocr_texto.txt');
+  });
 }
 
-// Inicializa SortableJS para reordenação
-function initSortable() {
+// ==========================================================================
+// Configuração da Barra Secundária de Operações com Páginas
+// ==========================================================================
+function setupPageActionEvents() {
+  btnRotateRight.addEventListener('click', () => rotateSelectedPages(90));
+  btnRotateLeft.addEventListener('click', () => rotateSelectedPages(-90));
+  btnRotate180.addEventListener('click', () => rotateSelectedPages(180));
+  btnFlipH.addEventListener('click', () => flipSelectedPages('H'));
+  btnFlipV.addEventListener('click', () => flipSelectedPages('V'));
+
+  btnInterleave.addEventListener('click', executeInterleave);
+  btnDeinterleave.addEventListener('click', executeDeinterleave);
+  btnReverse.addEventListener('click', executeReverseOrder);
+
+  btnMoveUp.addEventListener('click', () => moveSelectedPages(-1));
+  btnMoveDown.addEventListener('click', () => moveSelectedPages(1));
+  btnDuplicate.addEventListener('click', duplicateSelectedPages);
+  btnDeleteSelected.addEventListener('click', deleteSelectedPages);
+
+  btnSelectAll.addEventListener('click', () => selectAllPages(true));
+  btnDeselectAll.addEventListener('click', () => selectAllPages(false));
+  btnInvertSelection.addEventListener('click', invertPageSelection);
+  btnClearAllPages.addEventListener('click', clearAllPages);
+}
+
+// Zoom da Grade de Miniaturas
+function setupZoomControl() {
+  zoomRange.addEventListener('input', (e) => {
+    const size = e.target.value + 'px';
+    document.documentElement.style.setProperty('--thumb-size', size);
+  });
+}
+
+// Drag & Drop na Janela e no EmptyState
+function setupDragAndDrop() {
+  ['dragenter', 'dragover'].forEach(name => {
+    window.addEventListener(name, (e) => {
+      e.preventDefault();
+      emptyState.classList.add('drag-over');
+    }, false);
+  });
+
+  ['dragleave', 'drop'].forEach(name => {
+    window.addEventListener(name, (e) => {
+      e.preventDefault();
+      emptyState.classList.remove('drag-over');
+    }, false);
+  });
+
+  window.addEventListener('drop', (e) => {
+    e.preventDefault();
+    if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      importFiles(Array.from(e.dataTransfer.files));
+    }
+  });
+}
+
+// Atalhos de Teclado NAPS2
+function setupKeyboardShortcuts() {
+  window.addEventListener('keydown', (e) => {
+    // Não interferir se estiver digitando em um input
+    if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName)) return;
+
+    if (e.key === 'Delete' || e.key === 'Del') {
+      deleteSelectedPages();
+    } else if (e.ctrlKey && e.key.toLowerCase() === 'a') {
+      e.preventDefault();
+      selectAllPages(true);
+    } else if (e.ctrlKey && e.key.toLowerCase() === 's') {
+      e.preventDefault();
+      if (pages.length > 0) openModal(modalSavePdf);
+    } else if (e.ctrlKey && e.key.toLowerCase() === 'p') {
+      e.preventDefault();
+      if (pages.length > 0) executePrintPages();
+    }
+  });
+}
+
+// Inicializa SortableJS para a grade de páginas
+function initGridSortable() {
   if (!window.Sortable) return;
-  sortableInstance = new Sortable(fileList, {
+  sortableGrid = new Sortable(pageGrid, {
     animation: 200,
-    handle: '.drag-handle',
     ghostClass: 'sortable-ghost',
     chosenClass: 'sortable-chosen',
-    onEnd: () => syncOrderFromDOM()
+    onEnd: () => syncPagesFromDOM()
   });
 }
 
-function syncOrderFromDOM() {
-  const cardElements = fileList.querySelectorAll('.file-card');
+function syncPagesFromDOM() {
+  const cards = pageGrid.querySelectorAll('.naps-page-card');
   const newOrder = [];
-  cardElements.forEach((el) => {
-    const id = el.dataset.id;
-    const item = filesData.find(f => f.id === id);
+  cards.forEach(card => {
+    const id = card.dataset.id;
+    const item = pages.find(p => p.id === id);
     if (item) newOrder.push(item);
   });
-  filesData = newOrder;
-  updateOrderBadges();
+  pages = newOrder;
+  updatePageNumbers();
 }
 
 // ==========================================================================
-// Detecção e Processamento de Arquivos
+// IMPORTAÇÃO DE ARQUIVOS (Desempacotamento por Páginas)
 // ==========================================================================
-function getFileType(file) {
-  const name = file.name.toLowerCase();
-  if (name.endsWith('.pdf') || file.type === 'application/pdf') return 'pdf';
-  if (name.endsWith('.docx') || name.endsWith('.doc')) return 'docx';
-  if (name.endsWith('.jpg') || name.endsWith('.jpeg') || name.endsWith('.png') || name.endsWith('.webp') || name.endsWith('.bmp') || file.type.startsWith('image/')) return 'img';
-  if (name.endsWith('.txt') || file.type === 'text/plain') return 'txt';
-  return 'unknown';
-}
+async function importFiles(fileList) {
+  if (fileList.length === 0) return;
 
-async function handleIncomingFiles(newFiles) {
-  const supportedFiles = newFiles.filter(f => getFileType(f) !== 'unknown');
-
-  if (supportedFiles.length === 0) {
-    showToast('Formato não suportado. Use arquivos PDF, DOCX, Imagens (JPG, PNG) ou TXT.', 'error');
-    return;
-  }
-
-  showToast(`Carregando ${supportedFiles.length} arquivo(s)...`, 'default');
-
-  for (const file of supportedFiles) {
-    const type = getFileType(file);
-    const id = 'f_' + Date.now() + '_' + Math.random().toString(36).substr(2, 8);
-    const fileItem = {
-      id,
-      file,
-      name: file.name,
-      size: formatFileSize(file.size),
-      type,
-      pageCount: 'Carregando...',
-      thumbUrl: null,
-      rotation: 0,
-      docxHtml: null,
-      rawText: null
-    };
-
-    filesData.push(fileItem);
-    renderFileList();
-    updateUIState();
-
-    // Inspeciona e gera miniatura em background
-    processFileInspection(fileItem);
-  }
-}
-
-async function processFileInspection(item) {
-  try {
-    if (item.type === 'pdf') {
-      const buffer = await item.file.arrayBuffer();
-      if (window.pdfjsLib) {
-        try {
-          const pdfDoc = await pdfjsLib.getDocument({ data: buffer.slice(0) }).promise;
-          item.pageCount = `${pdfDoc.numPages} ${pdfDoc.numPages === 1 ? 'pág' : 'págs'}`;
-          const page = await pdfDoc.getPage(1);
-          const viewport = page.getViewport({ scale: 0.35 });
-          const canvas = document.createElement('canvas');
-          canvas.height = viewport.height;
-          canvas.width = viewport.width;
-          await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
-          item.thumbUrl = canvas.toDataURL();
-        } catch (e) {
-          const pdfLib = window.PDFLib || self.PDFLib;
-          if (pdfLib) {
-            const doc = await pdfLib.PDFDocument.load(buffer, { ignoreEncryption: true });
-            item.pageCount = `${doc.getPageCount()} págs`;
-          }
-        }
-      }
-    } else if (item.type === 'img') {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        item.thumbUrl = e.target.result;
-        const img = new Image();
-        img.onload = () => {
-          item.pageCount = `${img.width}x${img.height} px`;
-          updateCardDOM(item);
-        };
-        img.src = e.target.result;
-      };
-      reader.readAsDataURL(item.file);
-    } else if (item.type === 'docx') {
-      const buffer = await item.file.arrayBuffer();
-      if (window.mammoth) {
-        const result = await mammoth.convertToHtml({ arrayBuffer: buffer });
-        item.docxHtml = result.value;
-        item.pageCount = 'Doc Word';
-      }
-    } else if (item.type === 'txt') {
-      const text = await item.file.text();
-      item.rawText = text;
-      const lines = text.split('\n').length;
-      item.pageCount = `${lines} ${lines === 1 ? 'linha' : 'linhas'}`;
-    }
-  } catch (err) {
-    console.error('Erro na inspeção do arquivo:', item.name, err);
-    item.pageCount = 'Arquivo carregado';
-  }
-
-  updateCardDOM(item);
-}
-
-function updateCardDOM(item) {
-  const card = fileList.querySelector(`[data-id="${item.id}"]`);
-  if (!card) return;
-
-  const pageCountEl = card.querySelector('.file-pages');
-  if (pageCountEl) pageCountEl.textContent = item.pageCount;
-
-  const thumbContainer = card.querySelector('.thumb-preview');
-  if (thumbContainer && item.thumbUrl) {
-    thumbContainer.innerHTML = `<img src="${item.thumbUrl}" alt="Miniatura" style="transform: rotate(${item.rotation}deg); transition: transform 0.2s;">`;
-  }
-}
-
-// ==========================================================================
-// Renderização da Lista de Cards
-// ==========================================================================
-function renderFileList() {
-  fileList.innerHTML = '';
-
-  filesData.forEach((item, index) => {
-    const card = document.createElement('div');
-    card.className = 'file-card';
-    card.dataset.id = item.id;
-
-    let badgeClass = 'type-pdf';
-    let badgeText = 'PDF';
-    if (item.type === 'docx') { badgeClass = 'type-docx'; badgeText = 'DOCX'; }
-    else if (item.type === 'img') { badgeClass = 'type-img'; badgeText = 'IMG'; }
-    else if (item.type === 'txt') { badgeClass = 'type-txt'; badgeText = 'TXT'; }
-
-    let defaultIconSvg = `
-      <div class="thumb-preview-icon" style="color: #4f46e5;">
-        <span>${badgeText}</span>
-      </div>`;
-
-    card.innerHTML = `
-      <div class="drag-handle" title="Arraste para reposicionar">
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="9" cy="5" r="1"></circle>
-          <circle cx="9" cy="12" r="1"></circle>
-          <circle cx="9" cy="19" r="1"></circle>
-          <circle cx="15" cy="5" r="1"></circle>
-          <circle cx="15" cy="12" r="1"></circle>
-          <circle cx="15" cy="19" r="1"></circle>
-        </svg>
-      </div>
-      <div class="order-badge">#${index + 1}</div>
-      <div class="thumb-preview">
-        ${item.thumbUrl 
-          ? `<img src="${item.thumbUrl}" alt="Prévia" style="transform: rotate(${item.rotation}deg); transition: transform 0.2s;">` 
-          : defaultIconSvg}
-      </div>
-      <div class="file-info">
-        <div class="file-title-row">
-          <span class="file-name" title="${escapeHtml(item.name)}">${escapeHtml(item.name)}</span>
-          <span class="file-type-badge ${badgeClass}">${badgeText}</span>
-        </div>
-        <div class="file-meta">
-          <span class="file-size">${item.size}</span>
-          <span class="file-pages">${item.pageCount}</span>
-          ${item.rotation ? `<span class="text-primary font-bold">Giro: ${item.rotation}°</span>` : ''}
-        </div>
-      </div>
-      <div class="file-actions">
-        <button type="button" class="btn-icon btn-rotate" title="Girar 90° no sentido horário">
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="23 4 23 10 17 10"></polyline>
-            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
-          </svg>
-        </button>
-        <button type="button" class="btn-icon btn-move-up" title="Mover para cima" ${index === 0 ? 'disabled' : ''}>
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="18 15 12 9 6 15"></polyline>
-          </svg>
-        </button>
-        <button type="button" class="btn-icon btn-move-down" title="Mover para baixo" ${index === filesData.length - 1 ? 'disabled' : ''}>
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="6 9 12 15 18 9"></polyline>
-          </svg>
-        </button>
-        <button type="button" class="btn-icon btn-delete" title="Remover">
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="3 6 5 6 21 6"></polyline>
-            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-          </svg>
-        </button>
-      </div>
-    `;
-
-    card.querySelector('.btn-rotate').addEventListener('click', () => rotateItem(item.id));
-    card.querySelector('.btn-move-up').addEventListener('click', () => moveItem(index, -1));
-    card.querySelector('.btn-move-down').addEventListener('click', () => moveItem(index, 1));
-    card.querySelector('.btn-delete').addEventListener('click', () => removeItem(item.id));
-
-    fileList.appendChild(card);
-  });
-}
-
-function rotateItem(id) {
-  const item = filesData.find(f => f.id === id);
-  if (!item) return;
-  item.rotation = (item.rotation + 90) % 360;
-  renderFileList();
-}
-
-function moveItem(index, direction) {
-  const targetIndex = index + direction;
-  if (targetIndex < 0 || targetIndex >= filesData.length) return;
-  const item = filesData.splice(index, 1)[0];
-  filesData.splice(targetIndex, 0, item);
-  renderFileList();
-}
-
-function removeItem(id) {
-  filesData = filesData.filter(item => item.id !== id);
-  renderFileList();
-  updateUIState();
-  showToast('Arquivo removido', 'default');
-}
-
-function updateOrderBadges() {
-  const cards = fileList.querySelectorAll('.file-card');
-  cards.forEach((card, index) => {
-    const badge = card.querySelector('.order-badge');
-    if (badge) badge.textContent = `#${index + 1}`;
-    const upBtn = card.querySelector('.btn-move-up');
-    const downBtn = card.querySelector('.btn-move-down');
-    if (upBtn) upBtn.disabled = (index === 0);
-    if (downBtn) downBtn.disabled = (index === cards.length - 1);
-  });
-}
-
-function updateUIState() {
-  const count = filesData.length;
-  if (count > 0) {
-    toolbar.style.display = 'flex';
-    tipBanner.style.display = 'flex';
-    exportCard.style.display = 'flex';
-    fileCountBadge.textContent = `${count} ${count === 1 ? 'arquivo' : 'arquivos'}`;
-    const totalBytes = filesData.reduce((acc, cur) => acc + (cur.file ? cur.file.size : 0), 0);
-    totalSizeText.textContent = `Tamanho total: ${formatFileSize(totalBytes)}`;
-  } else {
-    toolbar.style.display = 'none';
-    tipBanner.style.display = 'none';
-    exportCard.style.display = 'none';
-  }
-}
-
-// ==========================================================================
-// Mesclador Multi-Formato Unificado (PDF + DOCX + IMG + TXT)
-// ==========================================================================
-async function executeUnifiedMerge() {
-  if (filesData.length === 0) {
-    showToast('Adicione pelo menos um arquivo.', 'error');
-    return;
-  }
-
-  mergeBtn.disabled = true;
-  mergeBtnText.textContent = 'Processando arquivos...';
   progressContainer.style.display = 'flex';
-  updateProgress(5, 'Iniciando criação do documento final...');
+  updateProgress(5, `Importando ${fileList.length} arquivo(s)...`);
 
   try {
-    const pdfLib = window.PDFLib || self.PDFLib;
-    if (!pdfLib || !pdfLib.PDFDocument) {
-      throw new Error('A biblioteca PDF-Lib não foi encontrada.');
-    }
+    for (let f = 0; f < fileList.length; f++) {
+      const file = fileList[f];
+      const name = file.name.toLowerCase();
+      const progressPercent = Math.round(10 + ((f + 1) / fileList.length) * 80);
+      updateProgress(progressPercent, `Processando: ${file.name}...`);
 
-    const { PDFDocument, degrees } = pdfLib;
-    const mergedPdf = await PDFDocument.create();
-    const isA4Layout = pageLayoutSelect.value === 'a4';
-    const totalFiles = filesData.length;
-
-    for (let i = 0; i < totalFiles; i++) {
-      const item = filesData[i];
-      const percent = Math.round(10 + ((i + 1) / totalFiles) * 75);
-      updateProgress(percent, `Processando (${i + 1}/${totalFiles}): ${item.name}...`);
-
-      if (item.type === 'pdf') {
-        const buffer = await item.file.arrayBuffer();
-        const srcDoc = await PDFDocument.load(buffer, { ignoreEncryption: true });
-        const copiedPages = await mergedPdf.copyPages(srcDoc, srcDoc.getPageIndices());
-        copiedPages.forEach(page => {
-          if (item.rotation) {
-            const currentAngle = page.getRotation().angle;
-            page.setRotation(degrees(currentAngle + item.rotation));
-          }
-          mergedPdf.addPage(page);
-        });
-      } else if (item.type === 'img') {
-        await appendImageToPdf(mergedPdf, item, isA4Layout);
-      } else if (item.type === 'docx') {
-        await appendDocxToPdf(mergedPdf, item);
-      } else if (item.type === 'txt') {
-        await appendTextToPdf(mergedPdf, item);
+      if (name.endsWith('.pdf') || file.type === 'application/pdf') {
+        await unpackPdfPages(file);
+      } else if (name.endsWith('.docx') || name.endsWith('.doc')) {
+        await unpackDocxPages(file);
+      } else if (name.endsWith('.txt') || file.type === 'text/plain') {
+        await unpackTxtPages(file);
+      } else if (file.type.startsWith('image/') || /\.(jpg|jpeg|png|webp|bmp|gif)$/i.test(name)) {
+        await unpackImagePage(file);
       }
     }
 
-    updateProgress(90, 'Compactando e finalizando PDF...');
-    const mergedPdfBytes = await mergedPdf.save();
-    updateProgress(100, 'Download pronto!');
-
-    let fileName = outputFileName.value.trim() || 'documento_unificado';
-    if (!fileName.toLowerCase().endsWith('.pdf')) fileName += '.pdf';
-
-    downloadBlob(new Blob([mergedPdfBytes], { type: 'application/pdf' }), fileName);
-    showToast('Documento mesclado com sucesso! Download iniciado.', 'success');
+    renderGrid();
+    updateUIState();
+    showToast(`${pages.length} página(s) carregada(s) no total.`, 'success');
   } catch (err) {
-    console.error('Falha na mesclagem:', err);
-    showToast(err.message || 'Erro ao gerar o documento unificado.', 'error');
+    console.error('Falha na importação:', err);
+    showToast('Erro ao importar arquivos: ' + err.message, 'error');
   } finally {
-    mergeBtn.disabled = false;
-    mergeBtnText.textContent = 'Juntar Tudo e Baixar PDF';
     setTimeout(() => {
       progressContainer.style.display = 'none';
       progressBar.style.width = '0%';
-    }, 2000);
+    }, 1500);
   }
 }
 
-// Anexa imagem ao PDF (A4 ou tamanho original)
-async function appendImageToPdf(pdfDoc, item, isA4) {
-  const { degrees } = window.PDFLib || self.PDFLib;
-  const imageBytes = await item.file.arrayBuffer();
-  let embeddedImage;
+// Desempacota cada página do PDF em um canvas independente
+async function unpackPdfPages(file) {
+  const buffer = await file.arrayBuffer();
+  const pdfDoc = await pdfjsLib.getDocument({ data: buffer.slice(0) }).promise;
 
-  try {
-    if (item.name.toLowerCase().endsWith('.png')) {
-      embeddedImage = await pdfDoc.embedPng(imageBytes);
-    } else {
-      embeddedImage = await pdfDoc.embedJpg(imageBytes);
-    }
-  } catch (e) {
-    // Fallback: renderizar via canvas para obter JPEG padrão
-    const dataUrl = await new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => {
-        const img = new Image();
-        img.onload = () => {
-          const cvs = document.createElement('canvas');
-          cvs.width = img.width;
-          cvs.height = img.height;
-          const ctx = cvs.getContext('2d');
-          ctx.drawImage(img, 0, 0);
-          resolve(cvs.toDataURL('image/jpeg', 0.92));
-        };
-        img.onerror = reject;
-        img.src = reader.result;
-      };
-      reader.onerror = reject;
-      reader.readAsDataURL(item.file);
-    });
+  for (let i = 1; i <= pdfDoc.numPages; i++) {
+    const page = await pdfDoc.getPage(i);
+    const viewport = page.getViewport({ scale: 1.5 }); // Escala nítida
+    const canvas = document.createElement('canvas');
+    canvas.width = viewport.width;
+    canvas.height = viewport.height;
+    const ctx = canvas.getContext('2d');
 
-    const b64 = dataUrl.split(',')[1];
-    const binary = atob(b64);
-    const bytes = new Uint8Array(binary.length);
-    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
-    embeddedImage = await pdfDoc.embedJpg(bytes);
-  }
+    await page.render({ canvasContext: ctx, viewport }).promise;
 
-  const imgDims = embeddedImage.scale(1);
+    // Tentar extrair texto da página
+    let text = '';
+    try {
+      const textContent = await page.getTextContent();
+      text = textContent.items.map(item => item.str).join(' ');
+    } catch (e) {}
 
-  if (isA4) {
-    // Página padrão A4 em pontos (595.28 x 841.89)
-    const pageWidth = 595.28;
-    const pageHeight = 841.89;
-    const margin = 36;
-    const maxWidth = pageWidth - margin * 2;
-    const maxHeight = pageHeight - margin * 2;
-
-    const scale = Math.min(maxWidth / imgDims.width, maxHeight / imgDims.height, 1);
-    const renderWidth = imgDims.width * scale;
-    const renderHeight = imgDims.height * scale;
-
-    const x = (pageWidth - renderWidth) / 2;
-    const y = (pageHeight - renderHeight) / 2;
-
-    const page = pdfDoc.addPage([pageWidth, pageHeight]);
-    page.drawImage(embeddedImage, {
-      x,
-      y,
-      width: renderWidth,
-      height: renderHeight
-    });
-
-    if (item.rotation) {
-      page.setRotation(degrees(item.rotation));
-    }
-  } else {
-    const page = pdfDoc.addPage([imgDims.width, imgDims.height]);
-    page.drawImage(embeddedImage, {
-      x: 0,
-      y: 0,
-      width: imgDims.width,
-      height: imgDims.height
-    });
-    if (item.rotation) {
-      page.setRotation(degrees(item.rotation));
-    }
+    addPageRecord(canvas, file.name, 'pdf', text);
   }
 }
 
-// Converte e anexa DOCX ao PDF renderizando em páginas A4 de alta fidelidade
-async function appendDocxToPdf(pdfDoc, item) {
-  let html = item.docxHtml;
-  if (!html) {
-    const buffer = await item.file.arrayBuffer();
-    const result = await mammoth.convertToHtml({ arrayBuffer: buffer });
-    html = result.value;
-  }
+// Desempacota imagem individual
+async function unpackImagePage(file) {
+  const canvas = await fileToCanvas(file);
+  addPageRecord(canvas, file.name, 'img', '');
+}
 
-  docxOffscreen.innerHTML = `
-    <div style="padding: 20px 10px;">
-      ${html}
+// Desempacota documento DOCX renderizando em páginas A4
+async function unpackDocxPages(file) {
+  const buffer = await file.arrayBuffer();
+  const result = await mammoth.convertToHtml({ arrayBuffer: buffer });
+  
+  offscreenRenderer.innerHTML = `
+    <div style="font-family: 'Times New Roman', serif; font-size: 14pt; line-height: 1.6; color: #111;">
+      ${result.value}
     </div>
   `;
 
-  // Renderiza com html2canvas
-  const fullCanvas = await html2canvas(docxOffscreen, {
-    scale: 2,
+  const fullCanvas = await html2canvas(offscreenRenderer, {
+    scale: 1.8,
     useCORS: true,
     backgroundColor: '#ffffff'
   });
+  offscreenRenderer.innerHTML = '';
 
-  docxOffscreen.innerHTML = '';
+  // Paginação A4 proporcional (1 : 1.414)
+  const a4Ratio = 1.414;
+  const pageHeight = fullCanvas.width * a4Ratio;
+  const numPages = Math.ceil(fullCanvas.height / pageHeight);
 
-  // Paginação inteligente para páginas A4
-  const a4WidthPt = 595.28;
-  const a4HeightPt = 841.89;
-  const aspectRatio = a4HeightPt / a4WidthPt;
-
-  const canvasPageHeight = fullCanvas.width * aspectRatio;
-  const totalPages = Math.ceil(fullCanvas.height / canvasPageHeight);
-
-  for (let p = 0; p < totalPages; p++) {
+  for (let p = 0; p < numPages; p++) {
     const pageCanvas = document.createElement('canvas');
     pageCanvas.width = fullCanvas.width;
-    pageCanvas.height = canvasPageHeight;
+    pageCanvas.height = pageHeight;
     const ctx = pageCanvas.getContext('2d');
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, pageCanvas.width, pageCanvas.height);
 
-    const sourceY = p * canvasPageHeight;
-    const sourceHeight = Math.min(canvasPageHeight, fullCanvas.height - sourceY);
+    const srcY = p * pageHeight;
+    const srcH = Math.min(pageHeight, fullCanvas.height - srcY);
+    ctx.drawImage(fullCanvas, 0, srcY, fullCanvas.width, srcH, 0, 0, fullCanvas.width, srcH);
 
-    ctx.drawImage(
-      fullCanvas,
-      0, sourceY, fullCanvas.width, sourceHeight,
-      0, 0, fullCanvas.width, sourceHeight
-    );
-
-    const imgDataUrl = pageCanvas.toDataURL('image/jpeg', 0.92);
-    const b64 = imgDataUrl.split(',')[1];
-    const binary = atob(b64);
-    const bytes = new Uint8Array(binary.length);
-    for (let k = 0; k < binary.length; k++) bytes[k] = binary.charCodeAt(k);
-
-    const embeddedPageImg = await pdfDoc.embedJpg(bytes);
-    const page = pdfDoc.addPage([a4WidthPt, a4HeightPt]);
-    page.drawImage(embeddedPageImg, {
-      x: 0,
-      y: 0,
-      width: a4WidthPt,
-      height: a4HeightPt
-    });
+    addPageRecord(pageCanvas, file.name, 'docx', '');
   }
 }
 
-// Anexa arquivo TXT ao PDF com formatação limpa
-async function appendTextToPdf(pdfDoc, item) {
-  const text = item.rawText || await item.file.text();
-  docxOffscreen.innerHTML = `
+// Desempacota arquivo TXT formatado em páginas A4
+async function unpackTxtPages(file) {
+  const text = await file.text();
+  offscreenRenderer.innerHTML = `
     <div style="font-family: 'Courier New', monospace; font-size: 13pt; line-height: 1.5; white-space: pre-wrap; color: #111;">
       ${escapeHtml(text)}
     </div>
   `;
 
-  const fullCanvas = await html2canvas(docxOffscreen, {
-    scale: 2,
-    useCORS: true,
-    backgroundColor: '#ffffff'
-  });
-  docxOffscreen.innerHTML = '';
+  const fullCanvas = await html2canvas(offscreenRenderer, { scale: 1.8, backgroundColor: '#ffffff' });
+  offscreenRenderer.innerHTML = '';
 
-  const a4WidthPt = 595.28;
-  const a4HeightPt = 841.89;
-  const aspectRatio = a4HeightPt / a4WidthPt;
-  const canvasPageHeight = fullCanvas.width * aspectRatio;
-  const totalPages = Math.ceil(fullCanvas.height / canvasPageHeight);
+  const a4Ratio = 1.414;
+  const pageHeight = fullCanvas.width * a4Ratio;
+  const numPages = Math.ceil(fullCanvas.height / pageHeight);
 
-  for (let p = 0; p < totalPages; p++) {
+  for (let p = 0; p < numPages; p++) {
     const pageCanvas = document.createElement('canvas');
     pageCanvas.width = fullCanvas.width;
-    pageCanvas.height = canvasPageHeight;
+    pageCanvas.height = pageHeight;
     const ctx = pageCanvas.getContext('2d');
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, pageCanvas.width, pageCanvas.height);
 
-    const sourceY = p * canvasPageHeight;
-    const sourceHeight = Math.min(canvasPageHeight, fullCanvas.height - sourceY);
-    ctx.drawImage(fullCanvas, 0, sourceY, fullCanvas.width, sourceHeight, 0, 0, fullCanvas.width, sourceHeight);
+    const srcY = p * pageHeight;
+    const srcH = Math.min(pageHeight, fullCanvas.height - srcY);
+    ctx.drawImage(fullCanvas, 0, srcY, fullCanvas.width, srcH, 0, 0, fullCanvas.width, srcH);
 
-    const imgDataUrl = pageCanvas.toDataURL('image/jpeg', 0.92);
-    const b64 = imgDataUrl.split(',')[1];
-    const binary = atob(b64);
-    const bytes = new Uint8Array(binary.length);
-    for (let k = 0; k < binary.length; k++) bytes[k] = binary.charCodeAt(k);
-
-    const embeddedPageImg = await pdfDoc.embedJpg(bytes);
-    const page = pdfDoc.addPage([a4WidthPt, a4HeightPt]);
-    page.drawImage(embeddedPageImg, {
-      x: 0,
-      y: 0,
-      width: a4WidthPt,
-      height: a4HeightPt
-    });
+    addPageRecord(pageCanvas, file.name, 'txt', text);
   }
 }
 
+// Cria e registra o objeto da página na lista principal
+function addPageRecord(canvas, sourceName, sourceType, text = '') {
+  const id = 'p_' + Date.now() + '_' + Math.random().toString(36).substr(2, 8);
+  const clonedCanvas = cloneCanvas(canvas);
+
+  const page = {
+    id,
+    sourceName,
+    sourceType,
+    originalCanvas: canvas,
+    processedCanvas: clonedCanvas,
+    thumbUrl: generateThumbnailDataUrl(clonedCanvas),
+    width: canvas.width,
+    height: canvas.height,
+    rotation: 0,
+    flipH: false,
+    flipV: false,
+    colorMode: 'original',
+    threshold: 128,
+    brightness: 0,
+    contrast: 0,
+    deskew: 0,
+    crop: { top: 0, bottom: 0, left: 0, right: 0 },
+    selected: false,
+    text
+  };
+
+  pages.push(page);
+}
+
 // ==========================================================================
-// Central de Ferramentas & Conversões (Aba 2)
+// RENDERIZAÇÃO DA GRADE VISUAL DE PÁGINAS (NAPS2 PAGE GRID)
 // ==========================================================================
-function setupToolsEvents() {
-  document.querySelectorAll('.tool-open-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const toolType = btn.dataset.tool;
-      openToolModal(toolType);
+function renderGrid() {
+  pageGrid.innerHTML = '';
+
+  if (pages.length === 0) {
+    emptyState.style.display = 'flex';
+    pageGrid.style.display = 'none';
+  } else {
+    emptyState.style.display = 'none';
+    pageGrid.style.display = 'grid';
+  }
+
+  pages.forEach((page, index) => {
+    const card = document.createElement('div');
+    card.className = `naps-page-card ${page.selected ? 'selected' : ''}`;
+    card.dataset.id = page.id;
+
+    // Transformação CSS para rotação e espelhamento
+    const scaleX = page.flipH ? -1 : 1;
+    const scaleY = page.flipV ? -1 : 1;
+    const transformStyle = `transform: rotate(${page.rotation}deg) scale(${scaleX}, ${scaleY});`;
+
+    card.innerHTML = `
+      <div class="page-card-header">
+        <span class="page-num-badge">#${index + 1}</span>
+        <input type="checkbox" class="page-select-checkbox" ${page.selected ? 'checked' : ''}>
+      </div>
+      <div class="page-thumb-container" title="Clique duplo para editar imagem e filtros">
+        <img src="${page.thumbUrl}" alt="Página ${index + 1}" style="${transformStyle}">
+      </div>
+      <div class="page-card-footer">
+        <span class="page-source-name" title="${escapeHtml(page.sourceName)}">${escapeHtml(page.sourceName)}</span>
+        <span class="page-dims">${page.width}x${page.height} px</span>
+      </div>
+    `;
+
+    // Seleção com clique ou Shift+Click
+    card.addEventListener('click', (e) => {
+      if (e.target.classList.contains('page-select-checkbox')) return;
+      togglePageSelection(page, e.shiftKey || e.ctrlKey);
     });
+
+    // Checkbox de seleção
+    const checkbox = card.querySelector('.page-select-checkbox');
+    checkbox.addEventListener('change', (e) => {
+      page.selected = e.target.checked;
+      card.classList.toggle('selected', page.selected);
+      updateSelectionStats();
+    });
+
+    // Clique duplo para abrir editor de imagem da página
+    card.addEventListener('dblclick', () => {
+      openImageAdjustModal(index);
+    });
+
+    pageGrid.appendChild(card);
   });
 
-  closeModalBtn.addEventListener('click', closeToolModal);
-  toolModalBackdrop.addEventListener('click', closeToolModal);
+  updateSelectionStats();
 }
 
-function openToolModal(toolType) {
-  modalToolBody.innerHTML = '';
+function updatePageNumbers() {
+  const cards = pageGrid.querySelectorAll('.naps-page-card');
+  cards.forEach((card, index) => {
+    const badge = card.querySelector('.page-num-badge');
+    if (badge) badge.textContent = `#${index + 1}`;
+  });
+  updateSelectionStats();
+}
 
-  switch (toolType) {
-    case 'docx-pdf':
-      renderToolDocxToPdf();
-      break;
-    case 'pdf-images':
-      renderToolPdfToImages();
-      break;
-    case 'split-pdf':
-      renderToolSplitPdf();
-      break;
-    case 'rotate-pdf':
-      renderToolRotatePdf();
-      break;
-    case 'pdf-txt':
-      renderToolPdfToTxt();
-      break;
-    case 'img-pdf':
-      renderToolImagesToPdf();
-      break;
-    default:
-      modalToolBody.innerHTML = '<p>Ferramenta em desenvolvimento.</p>';
+function togglePageSelection(page, isMulti) {
+  if (!isMulti) {
+    pages.forEach(p => p.selected = false);
+    page.selected = true;
+  } else {
+    page.selected = !page.selected;
+  }
+  renderGrid();
+}
+
+function selectAllPages(isSelected) {
+  pages.forEach(p => p.selected = isSelected);
+  renderGrid();
+}
+
+function invertPageSelection() {
+  pages.forEach(p => p.selected = !p.selected);
+  renderGrid();
+}
+
+function clearAllPages() {
+  if (pages.length === 0) return;
+  if (confirm('Deseja realmente remover todas as páginas do projeto?')) {
+    pages = [];
+    renderGrid();
+    updateUIState();
+    showToast('Todas as páginas foram removidas.', 'default');
+  }
+}
+
+function getSelectedPages() {
+  return pages.filter(p => p.selected);
+}
+
+function getActivePages() {
+  const selected = getSelectedPages();
+  return selected.length > 0 ? selected : pages;
+}
+
+function updateSelectionStats() {
+  const total = pages.length;
+  const selected = getSelectedPages().length;
+
+  pageCountText.innerHTML = `<strong>${total}</strong> página(s) no documento`;
+  selectionCountText.textContent = selected === 0 ? 'Nenhuma selecionada' : `${selected} selecionada(s)`;
+}
+
+function updateUIState() {
+  updateSelectionStats();
+}
+
+// ==========================================================================
+// OPERAÇÕES COM PÁGINAS (Girar, Espelhar, Intercalar, Mover, Duplicar, Excluir)
+// ==========================================================================
+function rotateSelectedPages(degrees) {
+  const targets = getActivePages();
+  if (targets.length === 0) return;
+
+  targets.forEach(p => {
+    p.rotation = (p.rotation + degrees + 360) % 360;
+  });
+  renderGrid();
+  showToast(`Páginas rotacionadas em ${degrees > 0 ? '+' : ''}${degrees}°.`, 'default');
+}
+
+function flipSelectedPages(direction) {
+  const targets = getActivePages();
+  if (targets.length === 0) return;
+
+  targets.forEach(p => {
+    if (direction === 'H') p.flipH = !p.flipH;
+    if (direction === 'V') p.flipV = !p.flipV;
+  });
+  renderGrid();
+  showToast(`Espelhado ${direction === 'H' ? 'horizontalmente' : 'verticalmente'}.`, 'default');
+}
+
+function moveSelectedPages(direction) {
+  const selected = getSelectedPages();
+  if (selected.length === 0) return;
+
+  if (direction < 0) {
+    // Mover para cima/esquerda
+    for (let i = 0; i < pages.length; i++) {
+      if (pages[i].selected && i > 0 && !pages[i - 1].selected) {
+        const temp = pages[i];
+        pages[i] = pages[i - 1];
+        pages[i - 1] = temp;
+      }
+    }
+  } else {
+    // Mover para baixo/direita
+    for (let i = pages.length - 1; i >= 0; i--) {
+      if (pages[i].selected && i < pages.length - 1 && !pages[i + 1].selected) {
+        const temp = pages[i];
+        pages[i] = pages[i + 1];
+        pages[i + 1] = temp;
+      }
+    }
+  }
+  renderGrid();
+}
+
+function duplicateSelectedPages() {
+  const selected = getSelectedPages();
+  if (selected.length === 0) {
+    showToast('Selecione as páginas que deseja duplicar.', 'error');
+    return;
   }
 
-  toolModal.style.display = 'flex';
+  const newPages = [];
+  pages.forEach(page => {
+    newPages.push(page);
+    if (page.selected) {
+      const cloned = {
+        ...page,
+        id: 'p_' + Date.now() + '_' + Math.random().toString(36).substr(2, 8),
+        originalCanvas: cloneCanvas(page.originalCanvas),
+        processedCanvas: cloneCanvas(page.processedCanvas),
+        selected: false
+      };
+      newPages.push(cloned);
+    }
+  });
+
+  pages = newPages;
+  renderGrid();
+  showToast(`${selected.length} página(s) duplicada(s).`, 'success');
 }
 
-function closeToolModal() {
-  toolModal.style.display = 'none';
-  modalToolBody.innerHTML = '';
+function deleteSelectedPages() {
+  const selected = getSelectedPages();
+  if (selected.length === 0) {
+    showToast('Selecione as páginas que deseja excluir.', 'error');
+    return;
+  }
+
+  if (confirm(`Excluir as ${selected.length} página(s) selecionada(s)?`)) {
+    pages = pages.filter(p => !p.selected);
+    renderGrid();
+    updateUIState();
+    showToast('Páginas excluídas.', 'default');
+  }
 }
 
-// Ferramenta: DOCX para PDF
-function renderToolDocxToPdf() {
-  modalToolTitle.textContent = 'Word (DOCX) para PDF';
-  modalToolBody.innerHTML = `
-    <p class="text-muted">Selecione um documento Word (.docx) para convertê-lo instantaneamente em PDF.</p>
-    <div class="form-group">
-      <input type="file" id="toolDocxInput" accept=".docx" class="select-input">
-    </div>
-    <div id="toolDocxStatus" style="display: none;" class="progress-status"></div>
-    <button type="button" class="btn btn-primary" id="btnExecuteDocxToPdf">
-      Converter para PDF
-    </button>
-  `;
+function executeReverseOrder() {
+  const selected = getSelectedPages();
+  if (selected.length > 1) {
+    // Inverter apenas as selecionadas mantendo as posições
+    const indices = [];
+    pages.forEach((p, idx) => { if (p.selected) indices.push(idx); });
+    const reversed = indices.slice().reverse();
+    const clonedPages = pages.slice();
+    indices.forEach((origIdx, i) => {
+      pages[origIdx] = clonedPages[reversed[i]];
+    });
+  } else {
+    // Inverter todas
+    pages.reverse();
+  }
+  renderGrid();
+  showToast('Ordem das páginas invertida!', 'default');
+}
 
-  document.getElementById('btnExecuteDocxToPdf').addEventListener('click', async () => {
-    const input = document.getElementById('toolDocxInput');
-    const status = document.getElementById('toolDocxStatus');
-    if (!input.files || input.files.length === 0) {
-      showToast('Selecione um arquivo .docx primeiro.', 'error');
-      return;
+// Recurso Assinatura NAPS2: Intercalar Duplex Manual
+// Combina pilha 1 (frente: 1, 3, 5) com pilha 2 (verso: 2, 4, 6 ou 6, 4, 2)
+function executeInterleave() {
+  if (pages.length < 2) {
+    showToast('São necessárias pelo menos 2 páginas para intercalar.', 'error');
+    return;
+  }
+
+  const isReverseBack = confirm(
+    'A segunda metade das páginas foi digitalizada na ordem inversa (ex: última página primeiro)?\n\n' +
+    'Clique em "OK" para inverter o verso automaticamente, ou "Cancelar" se já estiver na ordem direta.'
+  );
+
+  const half = Math.ceil(pages.length / 2);
+  const frontStack = pages.slice(0, half);
+  let backStack = pages.slice(half);
+
+  if (isReverseBack) {
+    backStack.reverse();
+  }
+
+  const interleaved = [];
+  const maxLen = Math.max(frontStack.length, backStack.length);
+
+  for (let i = 0; i < maxLen; i++) {
+    if (i < frontStack.length) interleaved.push(frontStack[i]);
+    if (i < backStack.length) interleaved.push(backStack[i]);
+  }
+
+  pages = interleaved;
+  renderGrid();
+  showToast('Páginas duplex intercaladas com sucesso!', 'success');
+}
+
+// Desintercalar: Separa páginas ímpares e pares (1, 3, 5... depois 2, 4, 6...)
+function executeDeinterleave() {
+  if (pages.length < 2) return;
+
+  const odds = [];
+  const evens = [];
+
+  pages.forEach((p, idx) => {
+    if (idx % 2 === 0) odds.push(p);
+    else evens.push(p);
+  });
+
+  pages = odds.concat(evens);
+  renderGrid();
+  showToast('Páginas desintercaladas (ímpares e pares separadas).', 'default');
+}
+
+// ==========================================================================
+// DIGITALIZADOR COM A CÂMERA (SCANNER)
+// ==========================================================================
+async function openScannerModal() {
+  openModal(modalScan);
+
+  try {
+    const devices = await navigator.mediaDevices.enumerateDevices();
+    const videoDevices = devices.filter(d => d.kind === 'videoinput');
+
+    scanCameraSelect.innerHTML = '';
+    videoDevices.forEach((device, i) => {
+      const opt = document.createElement('option');
+      opt.value = device.deviceId;
+      opt.textContent = device.label || `Câmera ${i + 1}`;
+      scanCameraSelect.appendChild(opt);
+    });
+
+    startCameraStream();
+  } catch (err) {
+    console.warn('Erro ao listar câmeras:', err);
+    startCameraStream();
+  }
+}
+
+async function startCameraStream() {
+  if (activeCameraStream) {
+    activeCameraStream.getTracks().forEach(t => t.stop());
+  }
+
+  const deviceId = scanCameraSelect.value;
+  const constraints = {
+    video: {
+      deviceId: deviceId ? { exact: deviceId } : undefined,
+      facingMode: deviceId ? undefined : 'environment',
+      width: { ideal: 1920 },
+      height: { ideal: 1080 }
+    }
+  };
+
+  try {
+    activeCameraStream = await navigator.mediaDevices.getUserMedia(constraints);
+    scanVideo.srcObject = activeCameraStream;
+  } catch (err) {
+    console.error('Falha ao acessar câmera:', err);
+    showToast('Não foi possível acessar a câmera. Verifique as permissões.', 'error');
+  }
+}
+
+scanCameraSelect.addEventListener('change', startCameraStream);
+
+function captureScanFrame() {
+  if (!activeCameraStream) return;
+
+  const canvas = document.getElementById('scanCaptureCanvas');
+  canvas.width = scanVideo.videoWidth || 1280;
+  canvas.height = scanVideo.videoHeight || 720;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(scanVideo, 0, 0, canvas.width, canvas.height);
+
+  // Aplicar perfil selecionado
+  const profile = scanProfileSelect.value;
+  const processed = cloneCanvas(canvas);
+
+  if (profile === 'bw') {
+    applyPixelFilters(processed, { colorMode: 'bw', threshold: 120, brightness: 10, contrast: 20 });
+  } else if (profile === 'gray') {
+    applyPixelFilters(processed, { colorMode: 'grayscale', threshold: 128, brightness: 0, contrast: 0 });
+  }
+
+  addPageRecord(processed, `Digitalização_${Date.now()}`, 'scan', '');
+  renderGrid();
+  updateUIState();
+  showToast('Página capturada e adicionada!', 'success');
+}
+
+function stopCameraStream() {
+  if (activeCameraStream) {
+    activeCameraStream.getTracks().forEach(t => t.stop());
+    activeCameraStream = null;
+  }
+}
+
+// ==========================================================================
+// EDITOR DE IMAGEM & TRATAMENTO NAPS2 (Brilho, Contraste, P&B Threshold, Deskew, Crop)
+// ==========================================================================
+function openImageAdjustModal(pageIndex) {
+  if (pageIndex < 0 || pageIndex >= pages.length) return;
+  editingPageIndex = pageIndex;
+  const page = pages[pageIndex];
+
+  // Carregar valores da página nos inputs
+  document.querySelector(`input[name="colorMode"][value="${page.colorMode}"]`).checked = true;
+  thresholdSection.style.display = page.colorMode === 'bw' ? 'block' : 'none';
+  thresholdSlider.value = page.threshold;
+  thresholdVal.textContent = page.threshold;
+
+  brightnessSlider.value = page.brightness;
+  brightnessVal.textContent = page.brightness + '%';
+
+  contrastSlider.value = page.contrast;
+  contrastVal.textContent = page.contrast + '%';
+
+  deskewSlider.value = page.deskew;
+  deskewVal.textContent = page.deskew + '°';
+
+  cropTop.value = page.crop.top;
+  cropBottom.value = page.crop.bottom;
+  cropLeft.value = page.crop.left;
+  cropRight.value = page.crop.right;
+
+  updateAdjustPreview();
+  openModal(modalImageAdjust);
+}
+
+function updateAdjustPreview() {
+  if (editingPageIndex < 0 || editingPageIndex >= pages.length) return;
+  const page = pages[editingPageIndex];
+
+  const colorMode = document.querySelector('input[name="colorMode"]:checked').value;
+  const threshold = parseInt(thresholdSlider.value, 10);
+  const brightness = parseInt(brightnessSlider.value, 10);
+  const contrast = parseInt(contrastSlider.value, 10);
+  const deskew = parseFloat(deskewSlider.value);
+  const crop = {
+    top: parseInt(cropTop.value, 10) || 0,
+    bottom: parseInt(cropBottom.value, 10) || 0,
+    left: parseInt(cropLeft.value, 10) || 0,
+    right: parseInt(cropRight.value, 10) || 0
+  };
+
+  // Renderiza prévia a partir do originalCanvas
+  renderFilteredCanvas(page.originalCanvas, adjustPreviewCanvas, {
+    colorMode,
+    threshold,
+    brightness,
+    contrast,
+    deskew,
+    crop,
+    flipH: page.flipH,
+    flipV: page.flipV,
+    rotation: page.rotation
+  });
+}
+
+// Eventos dos sliders do editor de imagem
+colorModeRadios.forEach(radio => {
+  radio.addEventListener('change', (e) => {
+    thresholdSection.style.display = e.target.value === 'bw' ? 'block' : 'none';
+    updateAdjustPreview();
+  });
+});
+
+thresholdSlider.addEventListener('input', (e) => {
+  thresholdVal.textContent = e.target.value;
+  updateAdjustPreview();
+});
+
+brightnessSlider.addEventListener('input', (e) => {
+  brightnessVal.textContent = e.target.value + '%';
+  updateAdjustPreview();
+});
+
+contrastSlider.addEventListener('input', (e) => {
+  contrastVal.textContent = e.target.value + '%';
+  updateAdjustPreview();
+});
+
+deskewSlider.addEventListener('input', (e) => {
+  deskewVal.textContent = e.target.value + '°';
+  updateAdjustPreview();
+});
+
+[cropTop, cropBottom, cropLeft, cropRight].forEach(input => {
+  input.addEventListener('input', updateAdjustPreview);
+});
+
+btnResetAdjust.addEventListener('click', () => {
+  document.querySelector('input[name="colorMode"][value="original"]').checked = true;
+  thresholdSection.style.display = 'none';
+  thresholdSlider.value = 128;
+  thresholdVal.textContent = '128';
+  brightnessSlider.value = 0;
+  brightnessVal.textContent = '0%';
+  contrastSlider.value = 0;
+  contrastVal.textContent = '0%';
+  deskewSlider.value = 0;
+  deskewVal.textContent = '0°';
+  cropTop.value = 0;
+  cropBottom.value = 0;
+  cropLeft.value = 0;
+  cropRight.value = 0;
+  updateAdjustPreview();
+});
+
+btnApplyAdjust.addEventListener('click', () => {
+  if (editingPageIndex < 0 || editingPageIndex >= pages.length) return;
+
+  const colorMode = document.querySelector('input[name="colorMode"]:checked').value;
+  const threshold = parseInt(thresholdSlider.value, 10);
+  const brightness = parseInt(brightnessSlider.value, 10);
+  const contrast = parseInt(contrastSlider.value, 10);
+  const deskew = parseFloat(deskewSlider.value);
+  const crop = {
+    top: parseInt(cropTop.value, 10) || 0,
+    bottom: parseInt(cropBottom.value, 10) || 0,
+    left: parseInt(cropLeft.value, 10) || 0,
+    right: parseInt(cropRight.value, 10) || 0
+  };
+
+  // Se houver mais de uma página selecionada, aplica a todas as selecionadas!
+  const selected = getSelectedPages();
+  const targets = selected.length > 1 && selected.includes(pages[editingPageIndex]) ? selected : [pages[editingPageIndex]];
+
+  targets.forEach(p => {
+    p.colorMode = colorMode;
+    p.threshold = threshold;
+    p.brightness = brightness;
+    p.contrast = contrast;
+    p.deskew = deskew;
+    p.crop = { ...crop };
+
+    // Regenera processedCanvas
+    renderFilteredCanvas(p.originalCanvas, p.processedCanvas, {
+      colorMode,
+      threshold,
+      brightness,
+      contrast,
+      deskew,
+      crop,
+      flipH: p.flipH,
+      flipV: p.flipV,
+      rotation: p.rotation
+    });
+
+    p.thumbUrl = generateThumbnailDataUrl(p.processedCanvas);
+  });
+
+  renderGrid();
+  closeModal(modalImageAdjust);
+  showToast(`Ajustes aplicados em ${targets.length} página(s)!`, 'success');
+});
+
+// Algoritmo de Filtros e Renderização em Canvas (Pixel-Level Processing)
+function renderFilteredCanvas(sourceCanvas, targetCanvas, options) {
+  const { colorMode, threshold, brightness, contrast, deskew, crop, flipH, flipV, rotation } = options;
+
+  // 1. Recorte de Margens (Crop)
+  const cropX = Math.round(sourceCanvas.width * (crop.left / 100));
+  const cropY = Math.round(sourceCanvas.height * (crop.top / 100));
+  const cropW = Math.max(10, sourceCanvas.width - cropX - Math.round(sourceCanvas.width * (crop.right / 100)));
+  const cropH = Math.max(10, sourceCanvas.height - cropY - Math.round(sourceCanvas.height * (crop.bottom / 100)));
+
+  // Canvas intermediário para rotação fina (deskew)
+  const intermediate = document.createElement('canvas');
+  intermediate.width = cropW;
+  intermediate.height = cropH;
+  const ctxInter = intermediate.getContext('2d');
+
+  if (deskew !== 0) {
+    ctxInter.save();
+    ctxInter.translate(cropW / 2, cropH / 2);
+    ctxInter.rotate((deskew * Math.PI) / 180);
+    ctxInter.drawImage(sourceCanvas, cropX, cropY, cropW, cropH, -cropW / 2, -cropH / 2, cropW, cropH);
+    ctxInter.restore();
+  } else {
+    ctxInter.drawImage(sourceCanvas, cropX, cropY, cropW, cropH, 0, 0, cropW, cropH);
+  }
+
+  // Dimensiona o canvas final
+  targetCanvas.width = cropW;
+  targetCanvas.height = cropH;
+  const ctx = targetCanvas.getContext('2d');
+  ctx.drawImage(intermediate, 0, 0);
+
+  // 2. Manipulação de Pixels (Brilho, Contraste, P&B Threshold, Tons de Cinza)
+  applyPixelFilters(targetCanvas, { colorMode, threshold, brightness, contrast });
+}
+
+function applyPixelFilters(canvas, { colorMode, threshold, brightness, contrast }) {
+  if (colorMode === 'original' && brightness === 0 && contrast === 0) return;
+
+  const ctx = canvas.getContext('2d');
+  const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const d = imgData.data;
+
+  // Pré-cálculo do fator de contraste
+  const contrastFactor = (259 * (contrast + 255)) / (255 * (259 - contrast));
+  const brightnessOffset = brightness * 2.55;
+
+  for (let i = 0; i < d.length; i += 4) {
+    let r = d[i];
+    let g = d[i + 1];
+    let b = d[i + 2];
+
+    // Brilho
+    if (brightness !== 0) {
+      r += brightnessOffset;
+      g += brightnessOffset;
+      b += brightnessOffset;
     }
 
-    const file = input.files[0];
-    status.style.display = 'block';
-    status.textContent = 'Convertendo documento...';
+    // Contraste
+    if (contrast !== 0) {
+      r = contrastFactor * (r - 128) + 128;
+      g = contrastFactor * (g - 128) + 128;
+      b = contrastFactor * (b - 128) + 128;
+    }
 
+    // Modo de Cor
+    if (colorMode === 'grayscale') {
+      const gray = 0.299 * r + 0.587 * g + 0.114 * b;
+      r = g = b = gray;
+    } else if (colorMode === 'bw') {
+      const gray = 0.299 * r + 0.587 * g + 0.114 * b;
+      const bw = gray < threshold ? 0 : 255;
+      r = g = b = bw;
+    } else if (colorMode === 'invert') {
+      r = 255 - r;
+      g = 255 - g;
+      b = 255 - b;
+    }
+
+    d[i] = Math.min(255, Math.max(0, r));
+    d[i + 1] = Math.min(255, Math.max(0, g));
+    d[i + 2] = Math.min(255, Math.max(0, b));
+  }
+
+  ctx.putImageData(imgData, 0, 0);
+}
+
+// ==========================================================================
+// SALVAR PDF (OPÇÕES, METADADOS & EXPORTAÇÃO)
+// ==========================================================================
+async function executeSavePdf() {
+  const scope = document.getElementById('pdfExportScope').value;
+  const layout = document.getElementById('pdfPageLayout').value;
+  let filename = document.getElementById('pdfFileName').value.trim() || 'documento_naps2';
+  if (!filename.toLowerCase().endsWith('.pdf')) filename += '.pdf';
+
+  const targetPages = scope === 'selected' ? getSelectedPages() : pages;
+  if (targetPages.length === 0) {
+    showToast('Nenhuma página para exportar com o filtro selecionado.', 'error');
+    return;
+  }
+
+  closeModal(modalSavePdf);
+  progressContainer.style.display = 'flex';
+  updateProgress(10, 'Iniciando criação do PDF unificado...');
+
+  try {
+    const pdfLib = window.PDFLib || self.PDFLib;
+    const { PDFDocument, degrees } = pdfLib;
+    const pdfDoc = await PDFDocument.create();
+
+    // Metadados NAPS2
+    const metaTitle = document.getElementById('pdfMetaTitle').value.trim();
+    const metaAuthor = document.getElementById('pdfMetaAuthor').value.trim();
+    const metaSubject = document.getElementById('pdfMetaSubject').value.trim();
+    if (metaTitle) pdfDoc.setTitle(metaTitle);
+    if (metaAuthor) pdfDoc.setAuthor(metaAuthor);
+    if (metaSubject) pdfDoc.setSubject(metaSubject);
+    pdfDoc.setCreator('PDF Studio Web (NAPS2 Edition)');
+
+    const a4Width = 595.28;
+    const a4Height = 841.89;
+
+    for (let i = 0; i < targetPages.length; i++) {
+      const page = targetPages[i];
+      const percent = Math.round(15 + ((i + 1) / targetPages.length) * 75);
+      updateProgress(percent, `Renderizando página ${i + 1} de ${targetPages.length}...`);
+
+      const imgBytes = await canvasToJpegBytes(page.processedCanvas, 0.92);
+      const embedded = await pdfDoc.embedJpg(imgBytes);
+
+      if (layout === 'a4') {
+        const p = pdfDoc.addPage([a4Width, a4Height]);
+        const margin = 24;
+        const maxW = a4Width - margin * 2;
+        const maxH = a4Height - margin * 2;
+        const scale = Math.min(maxW / page.processedCanvas.width, maxH / page.processedCanvas.height, 1);
+        const w = page.processedCanvas.width * scale;
+        const h = page.processedCanvas.height * scale;
+        const x = (a4Width - w) / 2;
+        const y = (a4Height - h) / 2;
+
+        p.drawImage(embedded, { x, y, width: w, height: h });
+        if (page.rotation) p.setRotation(degrees(page.rotation));
+      } else {
+        const p = pdfDoc.addPage([page.processedCanvas.width, page.processedCanvas.height]);
+        p.drawImage(embedded, { x: 0, y: 0, width: page.processedCanvas.width, height: page.processedCanvas.height });
+        if (page.rotation) p.setRotation(degrees(page.rotation));
+      }
+    }
+
+    updateProgress(95, 'Compactando documento...');
+    const pdfBytes = await pdfDoc.save();
+    downloadBlob(new Blob([pdfBytes], { type: 'application/pdf' }), filename);
+    showToast('PDF gerado e baixado com sucesso!', 'success');
+  } catch (err) {
+    console.error('Erro ao salvar PDF:', err);
+    showToast('Erro ao salvar PDF: ' + err.message, 'error');
+  } finally {
+    setTimeout(() => {
+      progressContainer.style.display = 'none';
+      progressBar.style.width = '0%';
+    }, 1500);
+  }
+}
+
+// ==========================================================================
+// SALVAR IMAGENS (ZIP) & IMPRIMIR
+// ==========================================================================
+async function executeSaveImages() {
+  const targetPages = getActivePages();
+  if (targetPages.length === 0) return;
+
+  progressContainer.style.display = 'flex';
+  updateProgress(10, 'Compactando páginas em imagens...');
+
+  try {
+    const zip = new JSZip();
+
+    for (let i = 0; i < targetPages.length; i++) {
+      const page = targetPages[i];
+      updateProgress(Math.round(15 + ((i + 1) / targetPages.length) * 80), `Processando imagem ${i + 1}...`);
+
+      const dataUrl = page.processedCanvas.toDataURL('image/jpeg', 0.95);
+      const b64 = dataUrl.split(',')[1];
+      const filename = `pagina_${String(i + 1).padStart(3, '0')}.jpg`;
+      zip.file(filename, b64, { base64: true });
+    }
+
+    const zipBlob = await zip.generateAsync({ type: 'blob' });
+    downloadBlob(zipBlob, 'paginas_exportadas.zip');
+    showToast('Imagens exportadas em arquivo ZIP!', 'success');
+  } catch (err) {
+    console.error(err);
+    showToast('Erro ao exportar imagens: ' + err.message, 'error');
+  } finally {
+    setTimeout(() => {
+      progressContainer.style.display = 'none';
+      progressBar.style.width = '0%';
+    }, 1500);
+  }
+}
+
+function executePrintPages() {
+  const targetPages = getActivePages();
+  if (targetPages.length === 0) return;
+
+  // Cria um container invisível temporário no body para impressão nativa
+  let printContainer = document.getElementById('printContainer');
+  if (!printContainer) {
+    printContainer = document.createElement('div');
+    printContainer.id = 'printContainer';
+    document.body.appendChild(printContainer);
+  }
+  printContainer.innerHTML = '';
+
+  targetPages.forEach(page => {
+    const pageWrapper = document.createElement('div');
+    pageWrapper.className = 'print-page';
+    const img = document.createElement('img');
+    img.src = page.processedCanvas.toDataURL('image/jpeg', 0.95);
+    pageWrapper.appendChild(img);
+    printContainer.appendChild(pageWrapper);
+  });
+
+  window.print();
+}
+
+async function executeShareDocument() {
+  if (pages.length === 0) {
+    showToast('Nenhum documento aberto para compartilhar.', 'error');
+    return;
+  }
+
+  if (navigator.share) {
     try {
       const pdfLib = window.PDFLib || self.PDFLib;
       const pdfDoc = await pdfLib.PDFDocument.create();
-      await appendDocxToPdf(pdfDoc, { file, name: file.name });
-      const pdfBytes = await pdfDoc.save();
-
-      const outName = file.name.replace(/\.docx$/i, '') + '.pdf';
-      downloadBlob(new Blob([pdfBytes], { type: 'application/pdf' }), outName);
-      showToast('DOCX convertido com sucesso!', 'success');
-      closeToolModal();
-    } catch (e) {
-      console.error(e);
-      showToast('Erro ao converter DOCX: ' + e.message, 'error');
-    }
-  });
-}
-
-// Ferramenta: PDF para Imagens (ZIP)
-function renderToolPdfToImages() {
-  modalToolTitle.textContent = 'Extrair Páginas do PDF em Imagens (ZIP)';
-  modalToolBody.innerHTML = `
-    <p class="text-muted">Todas as páginas do PDF serão convertidas em imagens e baixadas em um arquivo .zip.</p>
-    <div class="form-group">
-      <label>Arquivo PDF:</label>
-      <input type="file" id="toolPdfImgInput" accept="application/pdf" class="select-input">
-    </div>
-    <div class="form-group">
-      <label>Formato da Imagem:</label>
-      <select id="toolImgFormat" class="select-input">
-        <option value="image/png" selected>PNG (Alta fidelidade)</option>
-        <option value="image/jpeg">JPG (Mais leve)</option>
-      </select>
-    </div>
-    <div id="toolPdfImgStatus" style="display: none;" class="progress-status"></div>
-    <button type="button" class="btn btn-primary" id="btnExecutePdfToImages">Extrair Imagens e Baixar ZIP</button>
-  `;
-
-  document.getElementById('btnExecutePdfToImages').addEventListener('click', async () => {
-    const input = document.getElementById('toolPdfImgInput');
-    const status = document.getElementById('toolPdfImgStatus');
-    const format = document.getElementById('toolImgFormat').value;
-
-    if (!input.files || input.files.length === 0) {
-      showToast('Selecione um arquivo PDF primeiro.', 'error');
-      return;
-    }
-
-    const file = input.files[0];
-    status.style.display = 'block';
-    status.textContent = 'Lendo páginas do PDF...';
-
-    try {
-      const buffer = await file.arrayBuffer();
-      const pdfDoc = await pdfjsLib.getDocument({ data: buffer }).promise;
-      const zip = new JSZip();
-      const ext = format === 'image/png' ? 'png' : 'jpg';
-
-      for (let i = 1; i <= pdfDoc.numPages; i++) {
-        status.textContent = `Renderizando página ${i} de ${pdfDoc.numPages}...`;
-        const page = await pdfDoc.getPage(i);
-        const viewport = page.getViewport({ scale: 2 });
-        const canvas = document.createElement('canvas');
-        canvas.width = viewport.width;
-        canvas.height = viewport.height;
-        await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
-
-        const dataUrl = canvas.toDataURL(format, 0.95);
-        const b64 = dataUrl.split(',')[1];
-        zip.file(`pagina_${String(i).padStart(3, '0')}.${ext}`, b64, { base64: true });
+      for (const page of pages) {
+        const imgBytes = await canvasToJpegBytes(page.processedCanvas, 0.9);
+        const embedded = await pdfDoc.embedJpg(imgBytes);
+        const p = pdfDoc.addPage([595.28, 841.89]);
+        p.drawImage(embedded, { x: 0, y: 0, width: 595.28, height: 841.89 });
       }
-
-      status.textContent = 'Criando arquivo ZIP...';
-      const zipBlob = await zip.generateAsync({ type: 'blob' });
-      downloadBlob(zipBlob, file.name.replace(/\.pdf$/i, '') + '_imagens.zip');
-      showToast('Páginas extraídas com sucesso!', 'success');
-      closeToolModal();
-    } catch (e) {
-      console.error(e);
-      showToast('Erro ao extrair imagens: ' + e.message, 'error');
-    }
-  });
-}
-
-// Ferramenta: Dividir / Extrair PDF
-function renderToolSplitPdf() {
-  modalToolTitle.textContent = 'Dividir / Extrair Páginas do PDF';
-  modalToolBody.innerHTML = `
-    <p class="text-muted">Extraia apenas as páginas que você deseja salvar em um novo PDF.</p>
-    <div class="form-group">
-      <label>Arquivo PDF:</label>
-      <input type="file" id="toolSplitInput" accept="application/pdf" class="select-input">
-    </div>
-    <div class="form-group">
-      <label>Páginas desejadas (ex: 1-3, 5, 8-10):</label>
-      <input type="text" id="toolSplitPages" placeholder="Ex: 1-3, 5" class="select-input">
-    </div>
-    <div id="toolSplitStatus" style="display: none;" class="progress-status"></div>
-    <button type="button" class="btn btn-primary" id="btnExecuteSplit">Extrair Páginas Selecionadas</button>
-  `;
-
-  document.getElementById('btnExecuteSplit').addEventListener('click', async () => {
-    const input = document.getElementById('toolSplitInput');
-    const rangeText = document.getElementById('toolSplitPages').value.trim();
-    const status = document.getElementById('toolSplitStatus');
-
-    if (!input.files || input.files.length === 0) {
-      showToast('Selecione um arquivo PDF primeiro.', 'error');
-      return;
-    }
-    if (!rangeText) {
-      showToast('Informe as páginas que deseja extrair.', 'error');
-      return;
-    }
-
-    const file = input.files[0];
-    status.style.display = 'block';
-    status.textContent = 'Processando...';
-
-    try {
-      const pdfLib = window.PDFLib || self.PDFLib;
-      const buffer = await file.arrayBuffer();
-      const srcDoc = await pdfLib.PDFDocument.load(buffer, { ignoreEncryption: true });
-      const totalPages = srcDoc.getPageCount();
-
-      // Analisa o intervalo (ex: "1-3, 5")
-      const pagesToExtract = parsePageRanges(rangeText, totalPages);
-      if (pagesToExtract.length === 0) {
-        throw new Error('Nenhuma página válida encontrada no intervalo.');
-      }
-
-      const newDoc = await pdfLib.PDFDocument.create();
-      const copied = await newDoc.copyPages(srcDoc, pagesToExtract.map(p => p - 1));
-      copied.forEach(p => newDoc.addPage(p));
-
-      const newBytes = await newDoc.save();
-      downloadBlob(new Blob([newBytes], { type: 'application/pdf' }), file.name.replace(/\.pdf$/i, '') + '_extraido.pdf');
-      showToast('Páginas extraídas com sucesso!', 'success');
-      closeToolModal();
-    } catch (e) {
-      console.error(e);
-      showToast(e.message || 'Erro ao extrair páginas.', 'error');
-    }
-  });
-}
-
-// Ferramenta: Girar PDF
-function renderToolRotatePdf() {
-  modalToolTitle.textContent = 'Girar Páginas do PDF';
-  modalToolBody.innerHTML = `
-    <p class="text-muted">Altere a orientação de todas as páginas do PDF com facilidade.</p>
-    <div class="form-group">
-      <label>Arquivo PDF:</label>
-      <input type="file" id="toolRotateInput" accept="application/pdf" class="select-input">
-    </div>
-    <div class="form-group">
-      <label>Ângulo de Rotação:</label>
-      <select id="toolRotateAngle" class="select-input">
-        <option value="90">90° no sentido horário</option>
-        <option value="180">180° (de cabeça para baixo)</option>
-        <option value="270">270° (90° anti-horário)</option>
-      </select>
-    </div>
-    <div id="toolRotateStatus" style="display: none;" class="progress-status"></div>
-    <button type="button" class="btn btn-primary" id="btnExecuteRotate">Girar e Baixar PDF</button>
-  `;
-
-  document.getElementById('btnExecuteRotate').addEventListener('click', async () => {
-    const input = document.getElementById('toolRotateInput');
-    const angle = parseInt(document.getElementById('toolRotateAngle').value, 10);
-    const status = document.getElementById('toolRotateStatus');
-
-    if (!input.files || input.files.length === 0) {
-      showToast('Selecione um arquivo PDF primeiro.', 'error');
-      return;
-    }
-
-    const file = input.files[0];
-    status.style.display = 'block';
-    status.textContent = 'Rotacionando páginas...';
-
-    try {
-      const pdfLib = window.PDFLib || self.PDFLib;
-      const { degrees } = pdfLib;
-      const buffer = await file.arrayBuffer();
-      const doc = await pdfLib.PDFDocument.load(buffer, { ignoreEncryption: true });
-      
-      const pages = doc.getPages();
-      pages.forEach(p => {
-        p.setRotation(degrees(p.getRotation().angle + angle));
+      const bytes = await pdfDoc.save();
+      const file = new File([bytes], 'documento_naps2.pdf', { type: 'application/pdf' });
+      await navigator.share({
+        title: 'Documento Digitalizado',
+        files: [file]
       });
-
-      const rotatedBytes = await doc.save();
-      downloadBlob(new Blob([rotatedBytes], { type: 'application/pdf' }), file.name.replace(/\.pdf$/i, '') + '_girado.pdf');
-      showToast('PDF rotacionado com sucesso!', 'success');
-      closeToolModal();
+      showToast('Compartilhado com sucesso!', 'success');
     } catch (e) {
-      console.error(e);
-      showToast('Erro ao girar PDF: ' + e.message, 'error');
+      if (e.name !== 'AbortError') showToast('Não foi possível compartilhar: ' + e.message, 'error');
     }
-  });
-}
-
-// Ferramenta: PDF para Texto (TXT)
-function renderToolPdfToTxt() {
-  modalToolTitle.textContent = 'Extrair Texto do PDF (.txt)';
-  modalToolBody.innerHTML = `
-    <p class="text-muted">Extraia o texto contido no documento PDF para um arquivo de texto limpo.</p>
-    <div class="form-group">
-      <label>Arquivo PDF:</label>
-      <input type="file" id="toolTxtInput" accept="application/pdf" class="select-input">
-    </div>
-    <div id="toolTxtStatus" style="display: none;" class="progress-status"></div>
-    <button type="button" class="btn btn-primary" id="btnExecuteTxt">Extrair Texto</button>
-  `;
-
-  document.getElementById('btnExecuteTxt').addEventListener('click', async () => {
-    const input = document.getElementById('toolTxtInput');
-    const status = document.getElementById('toolTxtStatus');
-
-    if (!input.files || input.files.length === 0) {
-      showToast('Selecione um arquivo PDF primeiro.', 'error');
-      return;
-    }
-
-    const file = input.files[0];
-    status.style.display = 'block';
-    status.textContent = 'Extraindo texto das páginas...';
-
-    try {
-      const buffer = await file.arrayBuffer();
-      const pdfDoc = await pdfjsLib.getDocument({ data: buffer }).promise;
-      let fullText = '';
-
-      for (let i = 1; i <= pdfDoc.numPages; i++) {
-        status.textContent = `Lendo página ${i} de ${pdfDoc.numPages}...`;
-        const page = await pdfDoc.getPage(i);
-        const textContent = await page.getTextContent();
-        const pageText = textContent.items.map(item => item.str).join(' ');
-        fullText += `--- PÁGINA ${i} ---\n\n` + pageText + '\n\n';
-      }
-
-      downloadBlob(new Blob([fullText], { type: 'text/plain;charset=utf-8' }), file.name.replace(/\.pdf$/i, '') + '_texto.txt');
-      showToast('Texto extraído com sucesso!', 'success');
-      closeToolModal();
-    } catch (e) {
-      console.error(e);
-      showToast('Erro ao extrair texto: ' + e.message, 'error');
-    }
-  });
-}
-
-// Ferramenta: Imagens para PDF
-function renderToolImagesToPdf() {
-  modalToolTitle.textContent = 'Imagens para PDF';
-  modalToolBody.innerHTML = `
-    <p class="text-muted">Selecione uma ou mais fotos para agrupá-las em um único PDF.</p>
-    <div class="form-group">
-      <label>Imagens (JPG, PNG, WEBP):</label>
-      <input type="file" id="toolImgInput" accept="image/*" multiple class="select-input">
-    </div>
-    <div id="toolImgStatus" style="display: none;" class="progress-status"></div>
-    <button type="button" class="btn btn-primary" id="btnExecuteImagesToPdf">Gerar PDF com Imagens</button>
-  `;
-
-  document.getElementById('btnExecuteImagesToPdf').addEventListener('click', async () => {
-    const input = document.getElementById('toolImgInput');
-    const status = document.getElementById('toolImgStatus');
-
-    if (!input.files || input.files.length === 0) {
-      showToast('Selecione ao menos uma imagem.', 'error');
-      return;
-    }
-
-    status.style.display = 'block';
-    status.textContent = 'Convertendo imagens...';
-
-    try {
-      const pdfLib = window.PDFLib || self.PDFLib;
-      const pdfDoc = await pdfLib.PDFDocument.create();
-
-      for (const file of Array.from(input.files)) {
-        await appendImageToPdf(pdfDoc, { file, name: file.name, rotation: 0 }, true);
-      }
-
-      const pdfBytes = await pdfDoc.save();
-      downloadBlob(new Blob([pdfBytes], { type: 'application/pdf' }), 'imagens_unificadas.pdf');
-      showToast('PDF gerado com sucesso!', 'success');
-      closeToolModal();
-    } catch (e) {
-      console.error(e);
-      showToast('Erro ao converter imagens: ' + e.message, 'error');
-    }
-  });
+  } else {
+    window.location.href = `mailto:?subject=${encodeURIComponent('Documento PDF Studio Web')}`;
+  }
 }
 
 // ==========================================================================
-// Funções Utilitárias
+// OCR (RECONHECIMENTO ÓPTICO DE CARACTERES COM TESSERACT)
 // ==========================================================================
-function parsePageRanges(rangeStr, maxPages) {
-  const pages = new Set();
-  const parts = rangeStr.split(',');
+async function executeOcr() {
+  const targetPages = document.getElementById('ocrScope').value === 'selected' ? getSelectedPages() : pages;
+  if (targetPages.length === 0) {
+    showToast('Nenhuma página para processar no escopo selecionado.', 'error');
+    return;
+  }
 
-  parts.forEach(part => {
-    const trimmed = part.trim();
-    if (trimmed.includes('-')) {
-      const [start, end] = trimmed.split('-').map(n => parseInt(n.trim(), 10));
-      if (!isNaN(start) && !isNaN(end)) {
-        const from = Math.max(1, Math.min(start, end));
-        const to = Math.min(maxPages, Math.max(start, end));
-        for (let i = from; i <= to; i++) pages.add(i);
-      }
-    } else {
-      const num = parseInt(trimmed, 10);
-      if (!isNaN(num) && num >= 1 && num <= maxPages) {
-        pages.add(num);
+  const lang = document.getElementById('ocrLanguage').value;
+  const progressWrapper = document.getElementById('ocrProgressWrapper');
+  const ocrBar = document.getElementById('ocrProgressBar');
+  const ocrStatus = document.getElementById('ocrProgressStatus');
+  const resultWrapper = document.getElementById('ocrResultWrapper');
+  const resultTextarea = document.getElementById('ocrResultText');
+
+  progressWrapper.style.display = 'block';
+  resultWrapper.style.display = 'none';
+  ocrStatus.textContent = 'Inicializando motor Tesseract OCR...';
+  ocrBar.style.width = '10%';
+
+  try {
+    let fullText = '';
+
+    for (let i = 0; i < targetPages.length; i++) {
+      const page = targetPages[i];
+      ocrStatus.textContent = `Reconhecendo texto na página ${i + 1} de ${targetPages.length}...`;
+      ocrBar.style.width = `${Math.round(20 + ((i + 1) / targetPages.length) * 75)}%`;
+
+      if (page.text && page.text.trim().length > 20) {
+        // Se a página já possui texto vetorial nativo
+        fullText += `--- PÁGINA ${i + 1} ---\n\n${page.text}\n\n`;
+      } else if (window.Tesseract) {
+        // Executar Tesseract OCR no canvas processado
+        const dataUrl = page.processedCanvas.toDataURL('image/png');
+        const result = await Tesseract.recognize(dataUrl, lang, {
+          logger: m => {
+            if (m.status === 'recognizing text') {
+              ocrStatus.textContent = `Página ${i + 1}: ${Math.round((m.progress || 0) * 100)}% concluído...`;
+            }
+          }
+        });
+        const ocrString = result.data.text || '';
+        page.text = ocrString;
+        fullText += `--- PÁGINA ${i + 1} (OCR) ---\n\n${ocrString}\n\n`;
       }
     }
+
+    ocrBar.style.width = '100%';
+    ocrStatus.textContent = 'OCR finalizado!';
+    resultWrapper.style.display = 'block';
+    resultTextarea.value = fullText;
+    showToast('Reconhecimento de texto concluído!', 'success');
+  } catch (err) {
+    console.error('Erro no OCR:', err);
+    showToast('Erro no OCR: ' + err.message, 'error');
+  }
+}
+
+// ==========================================================================
+// DIVIDIR EM LOTES (BATCH SPLIT)
+// ==========================================================================
+async function executeBatchSplit() {
+  const method = document.getElementById('batchSplitType').value;
+  const pagesPerDoc = method === 'single-pages' ? 1 : (parseInt(document.getElementById('batchPagesPerDoc').value, 10) || 1);
+
+  closeModal(modalBatchSplit);
+  progressContainer.style.display = 'flex';
+  updateProgress(10, 'Dividindo documentos em lotes...');
+
+  try {
+    const pdfLib = window.PDFLib || self.PDFLib;
+    const { PDFDocument } = pdfLib;
+    const zip = new JSZip();
+
+    const totalBatches = Math.ceil(pages.length / pagesPerDoc);
+
+    for (let b = 0; b < totalBatches; b++) {
+      const batchDoc = await PDFDocument.create();
+      const start = b * pagesPerDoc;
+      const end = Math.min(start + pagesPerDoc, pages.length);
+
+      updateProgress(Math.round(15 + ((b + 1) / totalBatches) * 80), `Gerando lote ${b + 1} de ${totalBatches}...`);
+
+      for (let i = start; i < end; i++) {
+        const page = pages[i];
+        const imgBytes = await canvasToJpegBytes(page.processedCanvas, 0.92);
+        const embedded = await batchDoc.embedJpg(imgBytes);
+        const p = batchDoc.addPage([595.28, 841.89]);
+        p.drawImage(embedded, { x: 0, y: 0, width: 595.28, height: 841.89 });
+      }
+
+      const batchBytes = await batchDoc.save();
+      const filename = `documento_lote_${String(b + 1).padStart(3, '0')}.pdf`;
+      zip.file(filename, batchBytes);
+    }
+
+    const zipBlob = await zip.generateAsync({ type: 'blob' });
+    downloadBlob(zipBlob, 'lotes_divididos.zip');
+    showToast('Documentos divididos com sucesso!', 'success');
+  } catch (err) {
+    console.error(err);
+    showToast('Erro ao dividir em lotes: ' + err.message, 'error');
+  } finally {
+    setTimeout(() => {
+      progressContainer.style.display = 'none';
+      progressBar.style.width = '0%';
+    }, 1500);
+  }
+}
+
+// ==========================================================================
+// FUNÇÕES UTILITÁRIAS
+// ==========================================================================
+function openModal(modal) {
+  modal.style.display = 'flex';
+}
+
+function closeModal(modal) {
+  modal.style.display = 'none';
+  if (modal === modalScan) stopCameraStream();
+}
+
+function setupModalDismissals() {
+  document.querySelectorAll('.modal-close, [data-close]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const targetId = btn.dataset.close || btn.closest('.modal-overlay').id;
+      const modal = document.getElementById(targetId);
+      if (modal) closeModal(modal);
+    });
   });
 
-  return Array.from(pages).sort((a, b) => a - b);
+  document.querySelectorAll('.modal-overlay').forEach(overlay => {
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) closeModal(overlay);
+    });
+  });
+}
+
+function cloneCanvas(oldCanvas) {
+  const newCanvas = document.createElement('canvas');
+  newCanvas.width = oldCanvas.width;
+  newCanvas.height = oldCanvas.height;
+  const ctx = newCanvas.getContext('2d');
+  ctx.drawImage(oldCanvas, 0, 0);
+  return newCanvas;
+}
+
+function generateThumbnailDataUrl(canvas, maxDim = 320) {
+  const scale = Math.min(maxDim / canvas.width, maxDim / canvas.height, 1);
+  const thumb = document.createElement('canvas');
+  thumb.width = Math.round(canvas.width * scale);
+  thumb.height = Math.round(canvas.height * scale);
+  const ctx = thumb.getContext('2d');
+  ctx.drawImage(canvas, 0, 0, thumb.width, thumb.height);
+  return thumb.toDataURL('image/jpeg', 0.85);
+}
+
+async function fileToCanvas(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const cvs = document.createElement('canvas');
+        cvs.width = img.width;
+        cvs.height = img.height;
+        const ctx = cvs.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+        resolve(cvs);
+      };
+      img.onerror = reject;
+      img.src = e.target.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+async function canvasToJpegBytes(canvas, quality = 0.92) {
+  return new Promise((resolve) => {
+    canvas.toBlob((blob) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        resolve(new Uint8Array(reader.result));
+      };
+      reader.readAsArrayBuffer(blob);
+    }, 'image/jpeg', quality);
+  });
 }
 
 function downloadBlob(blob, filename) {
@@ -1103,17 +1475,9 @@ function downloadBlob(blob, filename) {
   setTimeout(() => URL.revokeObjectURL(url), 2000);
 }
 
-function updateProgress(percent, statusText) {
+function updateProgress(percent, text) {
   progressBar.style.width = `${percent}%`;
-  progressStatus.textContent = statusText;
-}
-
-function formatFileSize(bytes) {
-  if (bytes === 0) return '0 Bytes';
-  const k = 1024;
-  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+  progressStatus.textContent = text;
 }
 
 function escapeHtml(text) {
