@@ -150,7 +150,8 @@ quick-newton/
 │       ├── converterModal.js      # Modal de conversão multiformato (App.ConverterModal)
 │       ├── ocrModal.js            # Reconhecimento óptico Tesseract (App.OcrModal)
 │       ├── batchSplitModal.js     # Divisão em lotes em ZIP (App.BatchSplitModal)
-│       └── lgpdModal.js           # Banner e modal de privacidade (App.LgpdModal)
+│       ├── lgpdModal.js           # Banner e modal de privacidade (App.LgpdModal)
+│       └── categoryTabs.js        # Seletor de abas mobile estilo Docs/Excel (App.CategoryTabs)
 └── vendor/                        # Bibliotecas locais para uso 100% offline
 ```
 

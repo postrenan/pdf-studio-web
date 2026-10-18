@@ -25,6 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (App.OcrModal) App.OcrModal.init();
   if (App.BatchSplitModal) App.BatchSplitModal.init();
   if (App.LgpdModal) App.LgpdModal.init();
+  if (App.CategoryTabs) App.CategoryTabs.init();
 
   setupModalDismissals();
   setupKeyboardShortcuts();

@@ -1,19 +1,33 @@
 /* ==========================================================================
    Design Responsivo para Smartphones, Tablets e Telas Menores
-   (Mobile-First & Adaptive Breakpoints)
+   (Mobile-First & Adaptive Breakpoints - Estilo Office / Google Docs)
    ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Ajustes Padrão / Desktop (Regras Base das Abas)
+   -------------------------------------------------------------------------- */
+.category-tabs-bar {
+  display: none; /* Oculto em desktops e notebooks grandes */
+}
+
+.privacy-text-mobile {
+  display: none;
+}
+
+.privacy-text-full {
+  display: inline;
+}
 
 /* --------------------------------------------------------------------------
    Ajustes Globais e Toque (Touch Devices)
    -------------------------------------------------------------------------- */
 @media (hover: none) and (pointer: coarse) {
-  /* Alvos de toque mais confortáveis no celular */
-  button, input, select, .tool-btn, .ribbon-btn, .link-btn {
+  button, input, select, .tool-btn, .ribbon-btn, .link-btn, .cat-tab-btn {
     touch-action: manipulation;
   }
 
   .naps-page-card:hover {
-    transform: none; /* Evita 'hover' travado em toque no mobile */
+    transform: none;
   }
 
   .page-select-checkbox {
@@ -24,7 +38,7 @@
 }
 
 /* --------------------------------------------------------------------------
-   TABLET & SMARTPHONES (<= 992px)
+   TABLET & TELAS MÉDIAS (<= 992px)
    -------------------------------------------------------------------------- */
 @media (max-width: 992px) {
   .naps-header {
@@ -42,8 +56,8 @@
   }
 
   .logo-icon svg {
-    width: 22px;
-    height: 22px;
+    width: 20px;
+    height: 20px;
   }
 
   h1 {
@@ -57,10 +71,10 @@
 }
 
 /* --------------------------------------------------------------------------
-   SMARTPHONES E TELAS MÉDIAS (<= 768px)
+   SMARTPHONES E TELAS MOBILE (<= 768px) - INTERFACE COMPACTA TIPO DOCS/EXCEL
    -------------------------------------------------------------------------- */
 @media (max-width: 768px) {
-  /* Evitar zoom automático do iOS Safari em inputs com menos de 16px */
+  /* Prevenção de auto-zoom em inputs */
   input[type="text"],
   input[type="number"],
   select,
@@ -68,58 +82,161 @@
     font-size: 16px !important;
   }
 
-  /* Cabeçalho */
+  /* 1. Header Minimalista de 1 Linha (Altura Máxima ~48px) */
   .naps-header {
-    flex-direction: column;
-    align-items: stretch;
-    padding: 10px 12px;
-    gap: 10px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    gap: 8px;
+    border-bottom: 1px solid var(--border-color);
   }
 
   .logo-area {
-    width: 100%;
-    justify-content: flex-start;
+    width: auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
   }
 
-  .subtitle {
-    display: none; /* Oculta descrição longa no mobile para priorizar conteúdo */
+  .logo-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-sm);
+  }
+
+  .logo-icon svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .header-titles h1 {
+    font-size: 0.98rem;
+    font-weight: 800;
+    gap: 6px;
+    margin: 0;
+  }
+
+  .header-titles .subtitle {
+    display: none; /* Economiza 3 linhas de tela no smartphone */
+  }
+
+  .badge-tag {
+    font-size: 0.62rem;
+    padding: 1px 5px;
   }
 
   .privacy-badge {
-    width: 100%;
-    justify-content: center;
-    font-size: 0.72rem;
-    padding: 6px 10px;
-    white-space: normal;
-    text-align: center;
+    width: auto;
+    padding: 4px 8px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    white-space: nowrap;
+    border-radius: var(--radius-sm);
   }
 
-  /* Barra Ribbon Superior com Rolagem Horizontal Suave */
-  .naps-ribbon {
-    padding: 8px 12px;
-    gap: 10px;
+  .privacy-text-full {
+    display: none;
+  }
+
+  .privacy-text-mobile {
+    display: inline;
+  }
+
+  /* 2. Barra Seletora de Abas / Categorias (Estilo Office / Docs Mobile) */
+  .category-tabs-bar {
+    display: flex;
+    background-color: #ffffff;
+    border-bottom: 1px solid var(--border-color);
+    padding: 6px 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    z-index: 10;
+  }
+
+  .category-tabs-list {
+    display: flex;
+    gap: 6px;
+    width: 100%;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
-    scrollbar-width: thin;
+    scrollbar-width: none;
+  }
+
+  .category-tabs-list::-webkit-scrollbar {
+    display: none;
+  }
+
+  .cat-tab-btn {
+    flex: 1;
+    min-width: 78px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 6px 10px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-color);
+    background-color: #f8fafc;
+    color: var(--text-muted);
+    font-family: inherit;
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+  }
+
+  .cat-tab-btn svg {
+    flex-shrink: 0;
+    width: 15px;
+    height: 15px;
+  }
+
+  .cat-tab-btn.active {
+    background-color: var(--primary);
+    color: #ffffff;
+    border-color: var(--primary);
+    box-shadow: 0 2px 5px rgba(37, 99, 235, 0.28);
+  }
+
+  /* 3. Toolbar Dinâmica do Grupo Ativo (Sem Poluição) */
+  .naps-ribbon {
+    padding: 8px 10px;
+    gap: 8px;
+    border-bottom: 1px solid var(--border-color);
+    background-color: #fdfdfd;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
   }
 
   .naps-ribbon::-webkit-scrollbar {
-    height: 4px;
+    display: none;
   }
 
-  .naps-ribbon::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
-    border-radius: 4px;
+  .ribbon-divider {
+    display: none !important; /* Oculta divisores na visualização por abas */
+  }
+
+  .ribbon-group {
+    gap: 2px;
   }
 
   .ribbon-label {
-    font-size: 0.65rem;
+    display: none; /* O nome da aba no topo já indica a categoria */
+  }
+
+  .ribbon-buttons {
+    display: flex;
+    gap: 6px;
   }
 
   .ribbon-btn {
-    min-width: 62px;
-    padding: 6px 8px;
-    font-size: 0.75rem;
+    min-width: 68px;
+    padding: 7px 10px;
+    font-size: 0.74rem;
+    background-color: #ffffff;
+    border: 1px solid var(--border-color);
   }
 
   .ribbon-btn svg {
@@ -127,18 +244,16 @@
     height: 20px;
   }
 
-  .ribbon-divider {
-    height: 40px;
-  }
-
-  /* Barra Secundária de Ações em Páginas */
+  /* 4. Barra de Ações de Páginas (Aba "Páginas") */
   .page-action-bar {
-    padding: 8px 12px;
+    padding: 8px 10px;
     gap: 8px;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     flex-wrap: nowrap;
     scrollbar-width: none;
+    border-bottom: 1px solid var(--border-color);
+    background-color: #fdfdfd;
   }
 
   .page-action-bar::-webkit-scrollbar {
@@ -155,63 +270,71 @@
     flex-shrink: 0;
   }
 
+  .bar-separator {
+    height: 20px;
+    margin: 0 2px;
+  }
+
   .tool-btn {
     padding: 6px 9px;
     font-size: 0.75rem;
     white-space: nowrap;
   }
 
-  .tool-btn svg {
-    width: 15px;
-    height: 15px;
-  }
-
   .zoom-slider-wrapper {
-    padding: 4px 8px;
+    padding: 4px 6px;
   }
 
   .zoom-slider-wrapper input[type="range"] {
-    width: 64px;
+    width: 60px;
   }
 
-  /* Barra de Status e Seleção */
+  /* 5. Barra de Status e Seleção */
   .selection-status-bar {
-    padding: 8px 12px;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 8px;
+    padding: 6px 12px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+    font-size: 0.75rem;
+    background-color: #f1f5f9;
   }
 
   .selection-stats {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    font-size: 0.78rem;
+    gap: 6px;
+    font-size: 0.75rem;
+    white-space: nowrap;
   }
 
   .selection-actions {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 6px;
+    gap: 4px;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
-    padding-bottom: 2px;
+    scrollbar-width: none;
+  }
+
+  .selection-actions::-webkit-scrollbar {
+    display: none;
   }
 
   .link-btn {
-    padding: 5px 8px;
-    font-size: 0.74rem;
+    padding: 4px 7px;
+    font-size: 0.72rem;
     white-space: nowrap;
-    background-color: #f1f5f9;
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0;
     border-radius: var(--radius-sm);
   }
 
-  /* Grade de Miniaturas de Páginas */
+  /* 6. Grade de Miniaturas de Páginas (Ocupa a maior parte da tela) */
   .naps-page-grid {
-    padding: 12px;
-    gap: 12px;
-    grid-template-columns: repeat(auto-fill, minmax(135px, 1fr));
+    padding: 10px;
+    gap: 10px;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
   }
 
   .naps-page-card {
@@ -223,7 +346,7 @@
   }
 
   .page-num-badge {
-    font-size: 0.7rem;
+    font-size: 0.68rem;
     padding: 1px 5px;
   }
 
@@ -234,45 +357,46 @@
 
   /* Estado Vazio (Dropzone) */
   .naps-empty-state {
-    width: 94%;
-    padding: 36px 16px;
+    width: 92%;
+    padding: 32px 16px;
     margin: 16px auto;
   }
 
   .empty-icon-circle {
-    width: 60px;
-    height: 60px;
+    width: 56px;
+    height: 56px;
+    margin-bottom: 12px;
   }
 
   .empty-icon-circle svg {
-    width: 32px;
-    height: 32px;
+    width: 28px;
+    height: 28px;
   }
 
   .naps-empty-state h2 {
-    font-size: 1.15rem;
+    font-size: 1.1rem;
   }
 
   .naps-empty-state p {
-    font-size: 0.85rem;
-    margin-bottom: 20px;
+    font-size: 0.82rem;
+    margin-bottom: 16px;
   }
 
   .empty-actions {
     flex-direction: column;
     width: 100%;
-    max-width: 300px;
-    gap: 10px;
+    max-width: 280px;
+    gap: 8px;
   }
 
   .empty-actions .btn {
     width: 100%;
   }
 
-  /* Modais no Mobile (Adaptação Full-Width / Bottom-Sheet) */
+  /* 7. Modais Adaptativos em Telas Touch */
   .modal-overlay {
-    padding: 10px;
-    align-items: flex-end; /* Abre suavemente da base em telas touch */
+    padding: 8px;
+    align-items: flex-end; /* Abre suavemente da base como sheet */
   }
 
   .modal-dialog {
@@ -284,27 +408,27 @@
   }
 
   .modal-header {
-    padding: 12px 16px;
+    padding: 12px 14px;
   }
 
   .modal-header h3 {
-    font-size: 1.05rem;
+    font-size: 1.02rem;
   }
 
   .modal-body {
-    padding: 14px 16px;
-    gap: 14px;
+    padding: 14px;
+    gap: 12px;
   }
 
-  /* Modal de Câmera / Scanner */
+  /* Scanner Câmera */
   .scan-layout {
     grid-template-columns: 1fr;
-    gap: 14px;
+    gap: 12px;
   }
 
   .scan-preview-wrapper {
     aspect-ratio: 4 / 3;
-    max-height: 40vh;
+    max-height: 38vh;
   }
 
   .scan-actions {
@@ -315,23 +439,23 @@
     width: 100%;
   }
 
-  /* Modal de Ajuste de Imagem */
+  /* Ajuste de Imagem */
   .adjust-layout {
     grid-template-columns: 1fr;
-    gap: 14px;
+    gap: 12px;
   }
 
   .adjust-canvas-container {
-    max-height: 250px;
-    padding: 8px;
+    max-height: 220px;
+    padding: 6px;
   }
 
   #adjustPreviewCanvas {
-    max-height: 230px;
+    max-height: 200px;
   }
 
   .adjust-controls-container {
-    max-height: 45vh;
+    max-height: 44vh;
   }
 
   .adjust-btn-footer {
@@ -343,15 +467,15 @@
     width: 100%;
   }
 
-  /* Modal de LGPD / Banner Flutuante */
+  /* LGPD Floating Banner */
   .lgpd-floating-modal {
-    left: 12px;
-    right: 12px;
-    bottom: 12px;
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
     width: auto;
     max-width: none;
     transform: none;
-    animation: slideUpMobile 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    animation: slideUpMobile 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .lgpd-floating-modal.hidden {
@@ -364,13 +488,13 @@
   }
 
   .lgpd-floating-content {
-    padding: 14px 16px;
-    gap: 10px;
+    padding: 12px 14px;
+    gap: 8px;
   }
 
   .lgpd-floating-footer {
     flex-direction: column-reverse;
-    gap: 8px;
+    gap: 6px;
     align-items: stretch;
   }
 
@@ -382,14 +506,14 @@
   .naps-footer-minimal {
     flex-direction: column;
     gap: 6px;
-    padding: 12px;
+    padding: 10px;
     text-align: center;
   }
 
   .toast {
-    left: 12px;
-    right: 12px;
-    bottom: 16px;
+    left: 10px;
+    right: 10px;
+    bottom: 14px;
     text-align: center;
   }
 }
@@ -399,33 +523,39 @@
    -------------------------------------------------------------------------- */
 @media (max-width: 480px) {
   .logo-icon {
-    width: 32px;
-    height: 32px;
+    width: 28px;
+    height: 28px;
   }
 
   .logo-icon svg {
-    width: 20px;
-    height: 20px;
+    width: 16px;
+    height: 16px;
   }
 
-  h1 {
-    font-size: 1.02rem;
+  .header-titles h1 {
+    font-size: 0.92rem;
   }
 
-  .badge-tag {
-    font-size: 0.65rem;
-    padding: 1px 6px;
+  .cat-tab-btn {
+    min-width: 66px;
+    padding: 5px 8px;
+    font-size: 0.74rem;
   }
 
-  /* Grid em 2 colunas perfeitas em celulares pequenos */
+  .cat-tab-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  /* Duas colunas perfeitas de miniaturas em telas pequenas */
   .naps-page-grid {
-    padding: 8px;
-    gap: 8px;
+    padding: 6px;
+    gap: 6px;
     grid-template-columns: repeat(2, 1fr);
   }
 
   .page-thumb-container {
-    height: 130px;
+    height: 120px;
   }
 
   .crop-grid {
