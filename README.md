@@ -111,5 +111,49 @@ npm start
 
 ---
 
+## 🏗️ Estrutura e Arquitetura do Projeto
+
+O projeto foi inteiramente refatorado em uma arquitetura modular desacoplada, separando estilos, serviços de processamento, gerenciamento de estado e componentes de interface:
+
+```text
+quick-newton/
+├── index.html                     # Estrutura HTML da aplicação
+├── styles.css                     # Ponto central de carregamento de estilos (@import)
+├── css/                           # Estilos modulares organizados por componente
+│   ├── variables.css              # Cores, espaçamentos e temas
+│   ├── base.css                   # Reset, tipografia e layout geral
+│   ├── ribbon.css                 # Barra de ferramentas superior
+│   ├── actionBar.css              # Barra secundária de ações com páginas
+│   ├── pageGrid.css               # Grade visual interativa de miniaturas
+│   ├── modals.css                 # Estilos base para modais e overlays
+│   ├── scanner.css                # Interface da câmera/digitalizador
+│   ├── imageAdjust.css            # Painel e sliders do editor de imagem
+│   ├── lgpd.css                   # Banner flutuante e modal LGPD
+│   └── print.css                  # Folha de estilos para impressão nativa
+├── js/
+│   ├── main.js                    # Ponto de entrada (boot e atalhos globais)
+│   ├── state.js                   # Gerenciador de estado reativo (App.State)
+│   ├── utils/
+│   │   └── dom.js                 # Utilitários DOM, canvas e downloads (App.Utils)
+│   ├── services/                  # Motores de processamento de documentos
+│   │   ├── pdfService.js          # Desempacotamento e montagem com PDF-Lib (App.PdfService)
+│   │   ├── imageService.js        # Filtros de pixel, limiar P&B e rotação (App.ImageService)
+│   │   └── conversionService.js   # Exportação para DOCX, PPTX, XLSX, ZIP, TXT, MD, HTML
+│   └── components/                # Componentes isolados de interface
+│       ├── pageGrid.js            # Grade de páginas e ordenação SortableJS (App.PageGrid)
+│       ├── ribbon.js              # Barra superior e drag & drop global (App.Ribbon)
+│       ├── actionBar.js           # Rotação, duplex, zoom e seleção (App.ActionBar)
+│       ├── scannerModal.js        # Câmera e captura de frames (App.ScannerModal)
+│       ├── imageAdjustModal.js    # Editor ao vivo de imagens (App.ImageAdjustModal)
+│       ├── savePdfModal.js        # Configurações de exportação PDF (App.SavePdfModal)
+│       ├── converterModal.js      # Modal de conversão multiformato (App.ConverterModal)
+│       ├── ocrModal.js            # Reconhecimento óptico Tesseract (App.OcrModal)
+│       ├── batchSplitModal.js     # Divisão em lotes em ZIP (App.BatchSplitModal)
+│       └── lgpdModal.js           # Banner e modal de privacidade (App.LgpdModal)
+└── vendor/                        # Bibliotecas locais para uso 100% offline
+```
+
+---
+
 ## 📄 Licença
 Distribuído sob a licença [MIT](LICENSE).
