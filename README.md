@@ -68,10 +68,20 @@ Dê um clique duplo em qualquer página ou use o botão **Ajustar Imagem**:
 
 ---
 
-### 6. 💾 Salvar, Exportar & Imprimir
-- **Salvar PDF**: Com opções de metadados do documento (Título, Autor, Assunto), escolha de páginas (todas ou apenas selecionadas) e formato (A4 proporcional ou tamanho original).
-- **Salvar Imagens**: Exporte todas as páginas como imagens JPEG de alta qualidade compactadas em `.zip`.
-- **Dividir em Lotes (Batch Split)**: Separe automaticamente seu documento a cada N páginas ou gere um PDF individual para cada página.
+### 6. 🔄 Conversor Multi-Formato (PDF para Outros Modelos)
+Converta páginas ou documentos inteiros diretamente no navegador com 1 clique:
+- 📘 **PDF para Microsoft Word (`.docx`)**: Gera arquivos `.docx` nativos com páginas em alta fidelidade e texto editável.
+- 📙 **PDF para Microsoft PowerPoint (`.pptx`)**: Transforma cada página do PDF em um slide de apresentação.
+- 📊 **PDF para Microsoft Excel (`.xlsx` / `.csv`)**: Extrai linhas de dados e tabelas do documento para planilhas.
+- 🖼️ **PDF para Imagens (PNG / JPG em ZIP)**: Extraia todas as páginas em imagens de alta resolução.
+- 📝 **PDF para Texto Puro (`.txt`) & Markdown (`.md`)**: Conteúdo textual limpo com cabeçalhos estruturados.
+- 🌐 **PDF para Página Web (`.html`)**: Cria uma página web autônoma e responsiva pronta para compartilhamento.
+
+---
+
+### 7. 💾 Salvar, Lotes & Impressão
+- **Salvar PDF com Metadados**: Defina Título, Autor e Assunto no PDF final, com layout A4 ou dimensões originais.
+- **Dividir em Lotes (Batch Split)**: Separe automaticamente o documento a cada N páginas ou gere um PDF para cada folha.
 - **Imprimir**: Envie as páginas diretamente para a impressora com formatação limpa (<kbd>Ctrl</kbd>+<kbd>P</kbd>).
 - **Compartilhar**: Envio rápido via Web Share API ou e-mail.
 
