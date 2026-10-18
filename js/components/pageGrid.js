@@ -18,6 +18,9 @@ App.PageGrid = (function () {
         animation: 200,
         ghostClass: 'sortable-ghost',
         chosenClass: 'sortable-chosen',
+        delay: 200,
+        delayOnTouchOnly: true,
+        touchStartThreshold: 5,
         onEnd: () => syncOrderFromDOM()
       });
     }

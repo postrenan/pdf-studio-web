@@ -1,0 +1,434 @@
+/* ==========================================================================
+   Design Responsivo para Smartphones, Tablets e Telas Menores
+   (Mobile-First & Adaptive Breakpoints)
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Ajustes Globais e Toque (Touch Devices)
+   -------------------------------------------------------------------------- */
+@media (hover: none) and (pointer: coarse) {
+  /* Alvos de toque mais confortáveis no celular */
+  button, input, select, .tool-btn, .ribbon-btn, .link-btn {
+    touch-action: manipulation;
+  }
+
+  .naps-page-card:hover {
+    transform: none; /* Evita 'hover' travado em toque no mobile */
+  }
+
+  .page-select-checkbox {
+    transform: scale(1.3);
+    margin: 4px;
+    cursor: pointer;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   TABLET & SMARTPHONES (<= 992px)
+   -------------------------------------------------------------------------- */
+@media (max-width: 992px) {
+  .naps-header {
+    padding: 10px 16px;
+    gap: 12px;
+  }
+
+  .logo-area {
+    gap: 10px;
+  }
+
+  .logo-icon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .logo-icon svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  h1 {
+    font-size: 1.15rem;
+  }
+
+  .modal-dialog.modal-xl,
+  .modal-dialog.modal-lg {
+    max-width: 95vw;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   SMARTPHONES E TELAS MÉDIAS (<= 768px)
+   -------------------------------------------------------------------------- */
+@media (max-width: 768px) {
+  /* Evitar zoom automático do iOS Safari em inputs com menos de 16px */
+  input[type="text"],
+  input[type="number"],
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+
+  /* Cabeçalho */
+  .naps-header {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 10px 12px;
+    gap: 10px;
+  }
+
+  .logo-area {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .subtitle {
+    display: none; /* Oculta descrição longa no mobile para priorizar conteúdo */
+  }
+
+  .privacy-badge {
+    width: 100%;
+    justify-content: center;
+    font-size: 0.72rem;
+    padding: 6px 10px;
+    white-space: normal;
+    text-align: center;
+  }
+
+  /* Barra Ribbon Superior com Rolagem Horizontal Suave */
+  .naps-ribbon {
+    padding: 8px 12px;
+    gap: 10px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+  }
+
+  .naps-ribbon::-webkit-scrollbar {
+    height: 4px;
+  }
+
+  .naps-ribbon::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+  }
+
+  .ribbon-label {
+    font-size: 0.65rem;
+  }
+
+  .ribbon-btn {
+    min-width: 62px;
+    padding: 6px 8px;
+    font-size: 0.75rem;
+  }
+
+  .ribbon-btn svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .ribbon-divider {
+    height: 40px;
+  }
+
+  /* Barra Secundária de Ações em Páginas */
+  .page-action-bar {
+    padding: 8px 12px;
+    gap: 8px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    flex-wrap: nowrap;
+    scrollbar-width: none;
+  }
+
+  .page-action-bar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .action-bar-left {
+    flex-wrap: nowrap;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+
+  .action-bar-right {
+    flex-shrink: 0;
+  }
+
+  .tool-btn {
+    padding: 6px 9px;
+    font-size: 0.75rem;
+    white-space: nowrap;
+  }
+
+  .tool-btn svg {
+    width: 15px;
+    height: 15px;
+  }
+
+  .zoom-slider-wrapper {
+    padding: 4px 8px;
+  }
+
+  .zoom-slider-wrapper input[type="range"] {
+    width: 64px;
+  }
+
+  /* Barra de Status e Seleção */
+  .selection-status-bar {
+    padding: 8px 12px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .selection-stats {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.78rem;
+  }
+
+  .selection-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 2px;
+  }
+
+  .link-btn {
+    padding: 5px 8px;
+    font-size: 0.74rem;
+    white-space: nowrap;
+    background-color: #f1f5f9;
+    border-radius: var(--radius-sm);
+  }
+
+  /* Grade de Miniaturas de Páginas */
+  .naps-page-grid {
+    padding: 12px;
+    gap: 12px;
+    grid-template-columns: repeat(auto-fill, minmax(135px, 1fr));
+  }
+
+  .naps-page-card {
+    padding: 6px;
+  }
+
+  .page-card-header {
+    margin-bottom: 4px;
+  }
+
+  .page-num-badge {
+    font-size: 0.7rem;
+    padding: 1px 5px;
+  }
+
+  .page-card-footer {
+    padding-top: 4px;
+    font-size: 0.68rem;
+  }
+
+  /* Estado Vazio (Dropzone) */
+  .naps-empty-state {
+    width: 94%;
+    padding: 36px 16px;
+    margin: 16px auto;
+  }
+
+  .empty-icon-circle {
+    width: 60px;
+    height: 60px;
+  }
+
+  .empty-icon-circle svg {
+    width: 32px;
+    height: 32px;
+  }
+
+  .naps-empty-state h2 {
+    font-size: 1.15rem;
+  }
+
+  .naps-empty-state p {
+    font-size: 0.85rem;
+    margin-bottom: 20px;
+  }
+
+  .empty-actions {
+    flex-direction: column;
+    width: 100%;
+    max-width: 300px;
+    gap: 10px;
+  }
+
+  .empty-actions .btn {
+    width: 100%;
+  }
+
+  /* Modais no Mobile (Adaptação Full-Width / Bottom-Sheet) */
+  .modal-overlay {
+    padding: 10px;
+    align-items: flex-end; /* Abre suavemente da base em telas touch */
+  }
+
+  .modal-dialog {
+    max-width: 100% !important;
+    width: 100%;
+    max-height: 92vh;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+  .modal-header {
+    padding: 12px 16px;
+  }
+
+  .modal-header h3 {
+    font-size: 1.05rem;
+  }
+
+  .modal-body {
+    padding: 14px 16px;
+    gap: 14px;
+  }
+
+  /* Modal de Câmera / Scanner */
+  .scan-layout {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .scan-preview-wrapper {
+    aspect-ratio: 4 / 3;
+    max-height: 40vh;
+  }
+
+  .scan-actions {
+    width: 100%;
+  }
+
+  .scan-actions .btn {
+    width: 100%;
+  }
+
+  /* Modal de Ajuste de Imagem */
+  .adjust-layout {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .adjust-canvas-container {
+    max-height: 250px;
+    padding: 8px;
+  }
+
+  #adjustPreviewCanvas {
+    max-height: 230px;
+  }
+
+  .adjust-controls-container {
+    max-height: 45vh;
+  }
+
+  .adjust-btn-footer {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .adjust-btn-footer .btn {
+    width: 100%;
+  }
+
+  /* Modal de LGPD / Banner Flutuante */
+  .lgpd-floating-modal {
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+    width: auto;
+    max-width: none;
+    transform: none;
+    animation: slideUpMobile 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .lgpd-floating-modal.hidden {
+    transform: translateY(150%);
+  }
+
+  @keyframes slideUpMobile {
+    from { transform: translateY(100%); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+  .lgpd-floating-content {
+    padding: 14px 16px;
+    gap: 10px;
+  }
+
+  .lgpd-floating-footer {
+    flex-direction: column-reverse;
+    gap: 8px;
+    align-items: stretch;
+  }
+
+  .lgpd-floating-footer .btn,
+  .lgpd-floating-footer .btn-secondary {
+    width: 100%;
+  }
+
+  .naps-footer-minimal {
+    flex-direction: column;
+    gap: 6px;
+    padding: 12px;
+    text-align: center;
+  }
+
+  .toast {
+    left: 12px;
+    right: 12px;
+    bottom: 16px;
+    text-align: center;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   SMARTPHONES COMPACTOS (<= 480px)
+   -------------------------------------------------------------------------- */
+@media (max-width: 480px) {
+  .logo-icon {
+    width: 32px;
+    height: 32px;
+  }
+
+  .logo-icon svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  h1 {
+    font-size: 1.02rem;
+  }
+
+  .badge-tag {
+    font-size: 0.65rem;
+    padding: 1px 6px;
+  }
+
+  /* Grid em 2 colunas perfeitas em celulares pequenos */
+  .naps-page-grid {
+    padding: 8px;
+    gap: 8px;
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .page-thumb-container {
+    height: 130px;
+  }
+
+  .crop-grid {
+    grid-template-columns: 1fr;
+  }
+}

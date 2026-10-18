@@ -129,7 +129,8 @@ quick-newton/
 │   ├── scanner.css                # Interface da câmera/digitalizador
 │   ├── imageAdjust.css            # Painel e sliders do editor de imagem
 │   ├── lgpd.css                   # Banner flutuante e modal LGPD
-│   └── print.css                  # Folha de estilos para impressão nativa
+│   ├── print.css                  # Folha de estilos para impressão nativa
+│   └── responsive.css             # Adaptação para celulares, tablets e telas touch
 ├── js/
 │   ├── main.js                    # Ponto de entrada (boot e atalhos globais)
 │   ├── state.js                   # Gerenciador de estado reativo (App.State)
